@@ -37,7 +37,7 @@ def to_mysql(dataFrame):
 
 
 def read_data():
-    newData = pd.read_csv('./data/alipay_record_20211103_1435_1.csv',
+    newData = pd.read_csv('./data/alipay_record_20211105_1511_1.csv',
                           encoding='gb18030',
                           error_bad_lines=False,
                           skiprows=4)
