@@ -55,54 +55,54 @@
                         </div>
                          <!--    入账  -->
                         <div v-show="activeType===1">
-                            <el-row class="mt-4">
-                              <el-button>创建分类</el-button>
-                              <el-button type="primary">创建规则</el-button>
-                            </el-row>
+<!--                            <el-row class="mt-4">-->
+<!--                              <el-button>创建分类</el-button>-->
+<!--                              <el-button type="primary">创建规则</el-button>-->
+<!--                            </el-row>-->
+                            <div class="row">
 
-                            <!--    form  -->
-                            <el-form ref="form" :model="form" label-width="80px">
-                                <el-steps :active="activeStep" finish-status="success">
-                                  <el-step title="步骤 1"></el-step>
-                                  <el-step title="步骤 2"></el-step>
-                                  <el-step title="步骤 3"></el-step>
-                                </el-steps>
+                                <!--    form  -->
+                                <el-form ref="form" :model="form" label-width="80px">
+                                    <el-steps :active="activeStep" finish-status="success">
+                                      <el-step title="第一步选择上传分类" description="选择上传方式"></el-step>
+                                      <el-step title="第二步导入数据" description="选择上传文件"></el-step>
+                                      <el-step title="第三步数据导入完成" description="查看导入数据"></el-step>
+                                    </el-steps>
+                                  <el-form-item v-show="activeStep===0"  label="导入方式">
+                                    <el-radio-group  v-model="form.uploadType">
+                                      <el-radio label="1">支付宝csv导入</el-radio>
+                                      <el-radio label="2">微信csv导入</el-radio>
+                                    </el-radio-group>
+                                  </el-form-item>
+                                  <el-form-item v-show="activeStep===0" label="消费账户">
+                                    <el-select v-model="form.region" placeholder="请选择钱包">
+                                      <el-option label="老公钱包" value="shanghai"></el-option>
+                                      <el-option label="老婆钱包" value="beijing"></el-option>
+                                    </el-select>
+                                  </el-form-item>
 
-                              <el-form-item label="钱包">
-                                <el-select v-model="form.region" placeholder="请选择钱包">
-                                  <el-option label="老公钱包" value="shanghai"></el-option>
-                                  <el-option label="老婆钱包" value="beijing"></el-option>
-                                </el-select>
-                              </el-form-item>
-                              <el-form-item label="上传文件">
-                                <el-upload
-                                  class="upload-demo"
-                                  drag
-                                  action=""
-                                  :http-request="handleUpload"
-                                  multiple>
-                                  <i class="el-icon-upload"></i>
-                                  <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                                </el-upload>
-                                </el-checkbox-group>
-                              </el-form-item>
-                              <el-form-item label="文件来源">
-                                <el-radio-group v-model="form.resource">
-                                  <el-radio label="支付宝"></el-radio>
-                                  <el-radio label="微信"></el-radio>
-                                </el-radio-group>
-                              </el-form-item>
-                              <el-form-item label="活动形式">
-                                <el-input type="textarea" v-model="form.desc"></el-input>
-                              </el-form-item>
-                              <el-form-item>
-                                  <el-button type="primary"  @click="next">下一步</el-button>
-                              </el-form-item>
-                            </el-form>
+                                  <el-form-item v-show="activeStep===1" label="上传文件">
+                                    <el-upload
+                                      class="upload-demo"
+                                      drag
+                                      action=""
+                                      :http-request="handleUpload"
+                                      multiple>
+                                      <i class="el-icon-upload"></i>
+                                      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                    </el-upload>
+                                    </el-checkbox-group>
+                                  </el-form-item>
+                                  <el-form-item>
+                                      <el-button type="primary"  @click="next">下一步</el-button>
+                                       <el-button  @click="submit">主要按钮</el-button>
+                                  </el-form-item>
+                                </el-form>
+                            </div>
                         </div>
                          <!--    查账  -->
                         <div v-show="activeType===2">
-                            <h1 class="mt-4">22</h1>
+                            <h1 class="mt-4">日常收支表</h1>
                            <template>
                               <el-table
                                       :row-key="getRowKeys"
@@ -114,7 +114,7 @@
                                 <el-table-column type="expand">
                                   <template slot-scope="props">
                                     <el-form label-position="left" inline class="demo-table-expand">
-                                      <el-form-item label="商品名称">
+                                      <el-form-item label="一级分类">
                                         <span>{{ props.row.name }}</span>
                                       </el-form-item>
                                       <el-form-item label="所属店铺">
@@ -139,15 +139,15 @@
                                   </template>
                                 </el-table-column>
                                 <el-table-column
-                                  label="商品 ID"
+                                  label="一级分类"
                                   prop="id">
                                 </el-table-column>
                                 <el-table-column
-                                  label="商品名称"
+                                  label="二级分类"
                                   prop="name">
                                 </el-table-column>
                                 <el-table-column
-                                  label="描述"
+                                  label="金额"
                                   prop="desc">
                                 </el-table-column>
                               </el-table>
@@ -172,8 +172,11 @@
          <script src="https://unpkg.com/vue/dist/vue.js"></script>
          <!-- import JavaScript -->
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <!-- import axios -->
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
       <script>
-        new Vue({
+         new Vue({
           el: '#app',
           data: function() {
             return {
@@ -189,12 +192,12 @@
                       date2: '',
                       delivery: false,
                       type: [],
-                      resource: '',
+                      uploadType: '1',
                       desc: ''
                 },
                  tableData: [{
                       id: '12987122',
-                      name: '好滋好味鸡蛋仔',
+                      name: '对方',
                       category: '江浙小吃、小吃零食',
                       desc: '荷兰优质淡奶，奶香浓而不腻',
                       address: '上海市普陀区真北路',
@@ -242,8 +245,18 @@
                   }
               },
 
-              onSubmit: function (value) {
-                  console.log(value,'value')
+              submit: function () {
+                  var config = { headers: {
+                      'Content-Type': 'application/json',
+                      'Access-Control-Allow-Origin': '*'}
+                }
+                  axios.post('/me',{},{config})
+                  .then(function (response) {
+                    console.log(response);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
               }
           }
         })
