@@ -36,8 +36,8 @@ def to_mysql(dataFrame):
 
 
 
-def read_data():
-    newData = pd.read_csv('./data/alipay_record_20211105_1511_1.csv',
+def read_data(csv):
+    newData = pd.read_csv(csv,
                           encoding='gb18030',
                           error_bad_lines=False,
                           skiprows=4)
@@ -90,10 +90,3 @@ def read_data():
     return newData
 
 
-def main():
-    newData = read_data()
-    to_mysql(newData)
-
-
-if __name__ == '__main__':
-    main()

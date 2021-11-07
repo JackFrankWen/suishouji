@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, redirect, url_for
-import os
+from flask import Flask, render_template, request
 from flask_cors import CORS
+from upload import read_data, to_mysql
 
 
 app = Flask(__name__,
@@ -25,11 +25,12 @@ def upload_file():
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file:
-            filename = 'abc.csv'
-            print(request.files['file'])
-            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            data = read_data(file)
+            to_mysql(data)
             return 'file uploaded successfully'
     return 'sssssssssss'
+
+
 @app.route("/me", methods=['POST'])
 def me_api():
     return {
