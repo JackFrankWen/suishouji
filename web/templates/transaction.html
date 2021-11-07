@@ -83,11 +83,12 @@
 
                                   <el-form-item v-show="activeStep===1" label="上传文件">
                                     <el-upload
-                                      class="upload-demo"
+                                      ref="upload"
                                       drag
-                                      action=""
-                                      :http-request="handleUpload"
-                                      multiple>
+                                      action="http://localhost:5000/upload"
+                                      ref="upload"
+                                      :file-list="fileList"
+                                      >
                                       <i class="el-icon-upload"></i>
                                       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
                                     </el-upload>
@@ -183,7 +184,8 @@
                 visible: false,
                 getRowKeys: function(row) {return row.id},
                 expands: [],
-                activeType: 0,
+                fileList: [],
+                activeType: 1,
                 activeStep: 0, // 步骤条
                 form: {
                       name: '',
@@ -246,17 +248,18 @@
               },
 
               submit: function () {
-                  var config = { headers: {
-                      'Content-Type': 'application/json',
-                      'Access-Control-Allow-Origin': '*'}
-                }
-                  axios.post('/me',{},{config})
-                  .then(function (response) {
-                    console.log(response);
-                  })
-                  .catch(function (error) {
-                    console.log(error);
-                  });
+                //   var config = { headers: {
+                //       'Content-Type': 'application/json',
+                //       'Access-Control-Allow-Origin': '*'}
+                // }
+                //   axios.post('/me',{},{config})
+                //   .then(function (response) {
+                //     console.log(response);
+                //   })
+                //   .catch(function (error) {
+                //     console.log(error);
+                //   });
+                  this.$refs.upload.submit();
               }
           }
         })

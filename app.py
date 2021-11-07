@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for
+import os
 from flask_cors import CORS
 
 
@@ -19,10 +20,16 @@ def flow():
 @app.route("/upload", methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        print(request.files['file'])
-        f = request.files['file']
-        # data_xls = pd.read_excel(f)
-        # return data_xls.to_html()
+        # check if the post request has the file part
+        file = request.files['file']
+        # If the user does not select a file, the browser submits an
+        # empty file without a filename.
+        if file:
+            filename = 'abc.csv'
+            print(request.files['file'])
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            return 'file uploaded successfully'
+    return 'sssssssssss'
 @app.route("/me", methods=['POST'])
 def me_api():
     return {
