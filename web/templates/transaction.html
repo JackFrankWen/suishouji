@@ -70,23 +70,23 @@
                                     </el-steps>
                                   <el-form-item v-show="activeStep===0"  label="导入方式">
                                     <el-radio-group  v-model="form.uploadType">
-                                      <el-radio label="1">支付宝csv导入</el-radio>
-                                      <el-radio label="2">微信csv导入</el-radio>
+                                      <el-radio label="1" border>支付宝csv导入</el-radio>
+                                      <el-radio label="2" border>微信csv导入</el-radio>
                                     </el-radio-group>
                                   </el-form-item>
                                   <el-form-item v-show="activeStep===0" label="消费账户">
-                                    <el-select v-model="form.region" placeholder="请选择钱包">
-                                      <el-option label="老公钱包" value="shanghai"></el-option>
-                                      <el-option label="老婆钱包" value="beijing"></el-option>
-                                    </el-select>
+                                    <el-radio-group v-model="form.accountType">
+                                      <el-radio label="1" >老公钱包</el-radio>
+                                      <el-radio label="2" >老婆钱包</el-radio>
+                                    </el-radio-group>
                                   </el-form-item>
-
                                   <el-form-item v-show="activeStep===1" label="上传文件">
                                     <el-upload
                                       ref="upload"
                                       drag
                                       action="http://localhost:5000/upload"
                                       ref="upload"
+                                      :auto-upload="false"
                                       :file-list="fileList"
                                       >
                                       <i class="el-icon-upload"></i>
@@ -97,6 +97,7 @@
                                   <el-form-item>
                                       <el-button type="primary"  @click="next">下一步</el-button>
                                        <el-button  @click="submit">主要按钮</el-button>
+                                      <el-button @click="dialog = true">打开嵌套 Form 的 Drawer</el-button>
                                   </el-form-item>
                                 </el-form>
                             </div>
@@ -165,8 +166,39 @@
                     </div>
                 </div>
             </div>
+            <!--  drawer      -->
+            <el-drawer
+              title="添加规则"
+              :before-close="handleClose"
+              :visible.sync="dialog"
+              custom-class="demo-drawer"
+              :size="Number(800)"
+              ref="drawer"
+              >
+                <div class="demo-drawer__content">
+                    <el-form :model="drawerForm">
+                      <el-form-item label="匹配规则" label-width="80px">
+                        <el-input v-model="drawerForm.rule"></el-input>
+                      </el-form-item>
+                         <el-form-item label="分类" label-width="80px">
+                            <el-cascader-panel :options="options" clearable v-model="drawerForm.category"></el-cascader-panel>
+                         </el-form-item>
+                      <el-form-item label="标签" label-width="80px" >
+                        <el-select v-model="drawerForm.tag" placeholder="请选择标签">
+                          <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
+                        </el-select>
+                      </el-form-item>
+                    </el-form>
+                    <div class="demo-drawer__footer">
+                        <el-button @click="handleClose">取 消</el-button>
+                        <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                    </div>
+                </div>
+            </el-drawer>
         </div>
         {% endraw %}
+        <!-- import enum.js -->
+        <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
         <!-- import Vue before Element -->
@@ -175,7 +207,6 @@
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
         <!-- import axios -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-
       <script>
          new Vue({
           el: '#app',
@@ -186,18 +217,23 @@
                 expands: [],
                 fileList: [],
                 activeType: 1,
+                dialog: false, // 抽屉
+                loading: false,
                 activeStep: 0, // 步骤条
                 form: {
-                      name: '',
-                      region: '',
-                      date1: '',
-                      date2: '',
-                      delivery: false,
-                      type: [],
-                      uploadType: '1',
-                      desc: ''
+                    accountType: '1',
+                    type: [],
+                    uploadType: '1',
+
                 },
-                 tableData: [{
+                drawerForm:{
+                    category:'',
+                    tag:'',
+                    rule: '',
+                },
+                options: __eunm.categoryType,
+                selectOption: __eunm.getTag(),
+                tableData: [{
                       id: '12987122',
                       name: '对方',
                       category: '江浙小吃、小吃零食',
@@ -233,11 +269,13 @@
             }
           },
           methods: {
-              handleUpload: function() {
-
+              handleClose() {
+                   this.loading = false;
+                  this.dialog = false;
               },
               next() {
                 if (this.activeStep++ > 2) this.activeStep = 0;
+                console.log(this._data)
               },
               clickRowHandle(row, column, event) {
                   if (this.expands.includes(row.id)) {
@@ -246,7 +284,15 @@
                     this.expands.push(row.id);
                   }
               },
-
+              drawerSubmit () {
+                  axios.post('/me',{data: this.drawerForm},)
+                  .then(function (response) {
+                    console.log(response);
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              },
               submit: function () {
                 //   var config = { headers: {
                 //       'Content-Type': 'application/json',
