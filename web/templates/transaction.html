@@ -285,7 +285,7 @@
                   }
               },
               drawerSubmit () {
-                  axios.post('/me',{data: this.drawerForm},)
+                  axios.post('/add/rule',{data: this.drawerForm},)
                   .then(function (response) {
                     console.log(response);
                   })

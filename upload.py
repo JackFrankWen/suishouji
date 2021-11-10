@@ -49,11 +49,11 @@ def read_data(csv):
         'paymentTime',  # 付款时间----
         'updateTime',  # 付款时间----
         'transactionFrom',  # 交易来源地----
-        'type',  # 类型----
+        'cost_type',  # 类型----
         'payee',  # 交易对方
         'productName',  # 商品名称
         'amount',  # 金额(元)
-        'cost_type',  # 收/支
+        'type',  # 收/支
         'status',  # 交易状态---
         'servicePayment',  # 服务费（元）--
         'reciveMoney',  # 成功退款（元）--
@@ -63,20 +63,21 @@ def read_data(csv):
     ]
                            )
 
-    newData["description"] = '支付宝，' + newData["payee"].str.strip() + ',' + newData["productName"]
+    newData["description"] = newData["payee"].str.strip() + ',' + newData["productName"].str.strip()
     # 过滤空
-    newData = newData[newData['cost_type'].str.strip().astype(bool)]
+    newData = newData[newData['type'].str.strip().astype(bool)]
+
+
 
     newData = newData.drop(columns=[
         'paymentTime',  # 付款时间----
-        'cost_type',  # 付款时间----
+        'cost_type',   # 收/支
         'transactionNumber',  # 付款时间----
         'byNumber',  # 付款时间----
         'updateTime',  # 付款时间----
         'transactionFrom',  # 交易来源地----
         'payee',  # 交易来源地----
         'productName',  # 交易来源地----
-        'type',  # 类型----
         'status',  # 交易状态---
         'servicePayment',  # 服务费（元）--
         'reciveMoney',  # 成功退款（元）--
@@ -87,6 +88,10 @@ def read_data(csv):
 
     # 过滤没有金额
     newData = newData[newData['amount'] > 0]
+
+    newData.loc[(newData['type'].str.contains("支出")), "type"] = '1'
+
+    newData.loc[(newData['type'].str.contains("收入")), "type"] = '2'
     return newData
 
 
