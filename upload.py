@@ -3,14 +3,18 @@ from sqlalchemy import create_engine
 
 
 def to_mysql(dataFrame):
+
     hostname = "localhost"
     dbname = "bookkeep"
     uname = "root"
     pwd = "root"
     tableName = "transaction"
+
     engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}"
                            .format(host=hostname, db=dbname, user=uname, pw=pwd))
     dbConnection = engine.connect()
+
+
     try:
         frame = dataFrame.to_sql(tableName,
                                  dbConnection,
