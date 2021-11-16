@@ -1,7 +1,8 @@
 import mysql.connector
 from mysql.connector import errorcode
 
-from config import mysql_config
+from web.config import mysql_config
+
 def run_mysql(sql,data):
     try:
         conn = mysql.connector.connect(
