@@ -110,19 +110,30 @@
                               <el-form-item label="审批人">
                                 <el-date-picker
                                   v-model="formInline.picker"
-                                  type="monthrange"
+                                  type="daterange"
+                                  value-format="yyyy-MM-dd"
+                                  @change="dateChange"
                                   unlink-panels
                                   start-placeholder="开始月份"
                                   end-placeholder="结束月份"
                                   :picker-options="formInline.pickerOptions">
                                 </el-date-picker>
                               </el-form-item>
-                              <el-form-item label="活动区域">
-                                <el-select v-model="formInline.region" placeholder="活动区域">
-                                  <el-option label="区域一" value="shanghai"></el-option>
-                                  <el-option label="区域二" value="beijing"></el-option>
-                                </el-select>
-                              </el-form-item>
+                                <el-form-item label="消费成员" label-width="80px" >
+                                    <el-select v-model="formInline.consumer" placeholder="请选择标签">
+                                      <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="支付方式" label-width="80px" >
+                                    <el-select v-model="formInline.paymentType" placeholder="请选择支付方式">
+                                      <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="账户" label-width="80px" >
+                                    <el-select v-model="formInline.accountType" placeholder="请选择账户">
+                                      <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
                               <el-form-item>
                                 <el-button type="primary" @click="onSearch">查询</el-button>
                               </el-form-item>
@@ -199,6 +210,12 @@
               >
                 <div class="demo-drawer__content">
                     <el-form :model="drawerForm">
+                      <el-alert
+                        title="标签规则"
+                        type="warning"
+                        description="1.日常消费（买菜，沃尔玛） 2.一次性消费（零食，购物衣服） 3.固定消费（水电煤，加油费，理发话费）"
+                        show-icon>
+                      </el-alert>
                       <el-form-item label="匹配规则" label-width="80px">
                         <el-input v-model="drawerForm.rule" placeholder="描述中包含字符时命中规则"></el-input>
                       </el-form-item>
@@ -223,6 +240,8 @@
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- dayjs -->
+        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
         <!-- import Vue before Element -->
          <script src="https://unpkg.com/vue/dist/vue.js"></script>
          <!-- import JavaScript -->
@@ -248,27 +267,26 @@
                 },
                 formInline: {// 查账
                     picker: undefined,
-                    region: '',
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
                     pickerOptions: {
                       shortcuts: [{
                         text: '本月',
                         onClick(picker) {
-                            let date = new Date(value);
-                            let month = (date.getMonth() + 1).toString().padStart(2,'0');
-                            let year = date.getFullYear();
-                            let startTime = year + '' + month + '01';
-                            let day = new Date(year,month,0);
-                            let endTime = year + '' + month + '' + day.getDate();
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m, 1);
+                            const lastDay = new Date(y, m+1, 0);
 
-                            picker.$emit('pick', [startTime, endTime]);
+                            picker.$emit('pick', [firstDay, lastDay]);
                         }
                       }, {
                         text: '上个月',
                         onClick(picker) {
-                          const end = new Date();
-                          const start = new Date();
-                          start.setMonth(start.getMonth() - 1);
-                          picker.$emit('pick', [start, end]);
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m-1, 1);
+                            const lastDay = new Date(y, m, 0);
+                          picker.$emit('pick', [firstDay, lastDay]);
                         }
                       }]
                     },
@@ -280,6 +298,9 @@
                 },
                 options: __eunm.categoryType,
                 selectOption: __eunm.getTag(),
+                selectOptionConsumer: __eunm.getConsumer(),
+                selectOptionAccountType: __eunm.getAccountType(),
+                selectOptionPaymentType: __eunm.getPaymentType(),
                 tableData: [{
                       id: '12987122',
                       name: '对方',
@@ -316,6 +337,11 @@
             }
           },
           methods: {
+              dateChange(val){
+                  val[0] = val[0] + "T00:00:00"
+                  val[1] = val[1] + "T23:59:59"
+                  return val
+              },
               handleClose() {
                   this.loading = false;
                   this.dialog = false;

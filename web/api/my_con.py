@@ -33,10 +33,11 @@ def query_mysql(sql,data):
         )
         cur = conn.cursor()
         cur.execute(sql, data)
-        row = cur.fetchall()
+        columns = cur.description
+        result = [{columns[index][0]: column for index, column in enumerate(value)} for value in cur.fetchall()]
         cur.close()
         conn.close()
-        return row
+        return result
     except mysql.connector.Error as err:
         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
             print("Something is wrong with your user name or password")

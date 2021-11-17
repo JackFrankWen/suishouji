@@ -21,16 +21,27 @@ var __eunm = {
         3: '老婆',
         4: '牧牧'
     },
+    transform: function (obj) {
+        return Object.keys(obj).map(
+            (key) => ({label: obj[key], value: Number(key)})
+            )
+    },
+    getConsumer: function(){
+        return this.transform(this.consumer)
+    },
+    getAccountType: function(){
+        return this.transform(this.accountType)
+    },
+    getPaymentType: function(){
+        return this.transform(this.paymentType)
+    },
     tag: {
         1: '日常消费',
         2: '一次性消费',
         3: '固定消费'
     },
     getTag: function(){
-        const obj = this.tag;
-        return Object.keys(obj).map(
-            (key) => ({label: obj[key], value: Number(key)})
-            )
+        return this.transform(this.tag)
     },
     categoryType: [{
                   value: 10000,
@@ -40,7 +51,7 @@ var __eunm = {
                     label: '买菜',
                   }, {
                     value: 10002,
-                    label: '超市(沃尔玛)',
+                    label: '超市',
                   }, {
                     value: 10003,
                     label: '水果',
