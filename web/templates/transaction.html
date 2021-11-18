@@ -107,7 +107,7 @@
                         <div v-show="activeType===2">
                             <h1 class="mt-4">日常收支表</h1>
                             <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                              <el-form-item label="审批人">
+                              <el-form-item label="日期">
                                 <el-date-picker
                                   v-model="formInline.picker"
                                   type="daterange"
@@ -168,7 +168,39 @@
                         </div>
                          <!--    改账  -->
                         <div v-show="activeType===3">
-                            <h1 class="mt-4">3</h1>
+                            <h1 class="mt-4">改账</h1>
+                            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                              <el-form-item label="日期">
+                                <el-date-picker
+                                  v-model="formInline.picker"
+                                  type="daterange"
+                                  value-format="yyyy-MM-dd"
+                                  @change="dateChange"
+                                  unlink-panels
+                                  start-placeholder="开始月份"
+                                  end-placeholder="结束月份"
+                                  :picker-options="formInline.pickerOptions">
+                                </el-date-picker>
+                              </el-form-item>
+                                <el-form-item label="消费成员" label-width="80px" >
+                                    <el-select v-model="formInline.consumer" placeholder="请选择标签">
+                                      <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="支付方式" label-width="80px" >
+                                    <el-select v-model="formInline.paymentType" placeholder="请选择支付方式">
+                                      <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                                <el-form-item label="账户" label-width="80px" >
+                                    <el-select v-model="formInline.accountType" placeholder="请选择账户">
+                                      <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                              <el-form-item>
+                                <el-button type="primary" @click="onSearch">查询</el-button>
+                              </el-form-item>
+                            </el-form>
                         </div>
                          <!--    分析  -->
                         <div v-show="activeType===4">
@@ -191,7 +223,9 @@
                       <el-alert
                         title="标签规则"
                         type="warning"
-                        description="1.日常消费（买菜，沃尔玛） 2.一次性消费（零食，购物衣服） 3.固定消费（水电煤，加油费，理发话费）"
+                        description="1.日常消费（买菜，沃尔玛，工作餐）
+                        2.一次性消费（零食，购物衣服）
+                        3.固定消费（水电煤，加油费，理发，话费）"
                         show-icon>
                       </el-alert>
                       <el-form-item label="匹配规则" label-width="80px">
@@ -283,35 +317,7 @@
                 selectOptionConsumer: __eunm.getConsumer(),
                 selectOptionAccountType: __eunm.getAccountType(),
                 selectOptionPaymentType: __eunm.getPaymentType(),
-                tableData: [{
-                      id: '12987122',
-                      name: '对方',
-                      category: '江浙小吃、小吃零食',
-                      desc: '荷兰优质淡奶，奶香浓而不腻',
-                      address: '上海市普陀区真北路',
-                      shop: '王小虎夫妻店',
-                      shopId: '10333',
-                        child:[{id:1},{id:2}]
-                    }, {
-                      id: '12987123',
-                      name: '好滋好味鸡蛋仔',
-                      category: '江浙小吃、小吃零食',
-                      desc: '荷兰优质淡奶，奶香浓而不腻',
-                      address: '上海市普陀区真北路',
-                      shop: '王小虎夫妻店',
-                      shopId: '10333'
-                    }, {
-                      id: '12987125',
-                      name: '好滋好味鸡蛋仔',
-                      category: '江浙小吃、小吃零食',
-                      desc: '荷兰优质淡奶，奶香浓而不腻',
-                      address: '上海市普陀区真北路',
-                      shop: '王小虎夫妻店',
-                      shopId: '10333'
-                    }, {
-                      id: '12987126',
-                      name: '好滋好味鸡蛋仔',
-                    }]
+                tableData: []
             }
           },
           methods: {
@@ -340,9 +346,19 @@
                   }
               },
               drawerSubmit () {
+                  const _this = this;
                   axios.post('/add/rule',{data: this.drawerForm},)
                   .then(function (response) {
                     console.log(response);
+                      _this.drawerForm={
+                            category:'',
+                            tag:'',
+                            rule: '',
+                      };
+                      _this.$message({
+                          message: '提交成功',
+                          type: 'success'
+                        })
                   })
                   .catch(function (error) {
                     console.log(error);

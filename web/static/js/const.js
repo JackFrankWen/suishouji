@@ -67,10 +67,13 @@ var __eunm = {
                     label: '水果',
                   }, {
                     value: 10004,
-                    label: '零食',
+                    label: '零食（宵夜）',
                   }, {
                     value: 10005,
-                    label: '工作餐',
+                    label: '工作餐（早午晚）',
+                  }, {
+                    value: 10006,
+                    label: '下馆子',
                   }]
                  }, {
                   value: 50000,
@@ -99,7 +102,7 @@ var __eunm = {
                   }]
                 }, {
                   value: 20000,
-                  label: '居家生活',
+                  label: '家庭杂费',
                   children: [{
                     value: 20001,
                     label: '水费',

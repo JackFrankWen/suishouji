@@ -73,9 +73,22 @@ def read_data(csv):
 
 
 
+
+
+    # 过滤没有金额
+    newData = newData[newData['amount'] > 0]
+
+    newData.loc[(newData['type'].str.contains("支出")), "flow_type"] = '1'
+
+    newData.loc[(newData['type'].str.contains("收入")), "flow_type"] = '2'
+    # newData.loc[(newData['type'].str.contains("其他")), "flow_type"] = '3'
+    # newData = newData.drop(newData[newData.flow_type == "3"].index)
+    newData = newData.drop(newData[newData['status'].str.contains("交易关闭")].index)
+    newData = newData[newData["status"].str.contains("交易关闭") == False]
+    newData = newData[newData["type"].str.contains("其他") == False]
     newData = newData.drop(columns=[
         'paymentTime',  # 付款时间----
-        'cost_type',   # 收/支
+        'cost_type',  # 收/支
         'transactionNumber',  # 付款时间----
         'byNumber',  # 付款时间----
         'updateTime',  # 付款时间----
@@ -86,16 +99,9 @@ def read_data(csv):
         'servicePayment',  # 服务费（元）--
         'reciveMoney',  # 成功退款（元）--
         'cashStatus',  # 资金状态---
+        'type',  # 资金状态---
         'unNamed'  # ---
     ])
-
-
-    # 过滤没有金额
-    newData = newData[newData['amount'] > 0]
-
-    newData.loc[(newData['type'].str.contains("支出")), "type"] = '1'
-
-    newData.loc[(newData['type'].str.contains("收入")), "type"] = '2'
     return newData
 
 

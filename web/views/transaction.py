@@ -56,6 +56,7 @@ def upload_file():
             data['account_type'] = request.form['accountType']
             data['payment_type'] = request.form['paymentType']
             data = load_rule_data(data)
+            print(data)
             to_mysql(data)
             return 'file uploaded successfully'
     return 'sssssssssss'
@@ -64,8 +65,8 @@ def load_rule_data(data):
     ruleData = get_all_rule()
     for row in ruleData:
 
-        data.loc[data['description'].str.contains(row[1]), 'tag'] = row['tag']
-        data.loc[data['description'].str.contains(row[1]), 'category'] = row['category']
+        data.loc[data['description'].str.contains(row['rule']), 'tag'] = row['tag']
+        data.loc[data['description'].str.contains(row['rule']), 'category'] = row['category']
 
     return data
 
@@ -155,7 +156,6 @@ def transform_data(list, category, categoryObj):
 
 def get_list_amount(obj, categoryObj):
     arr = []
-    print(type(categoryObj))
     for item in obj:
         child_arr = []
         new_obj = obj[item]
