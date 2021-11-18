@@ -148,18 +148,12 @@
                               >
                                 <el-table-column type="expand">
                                   <template slot-scope="props">
-                                    <div label-position="left" inline class="demo-table-expand container">
-                                      <div class="row align-items-center">
-                                        <span class="col text-center"></span>
-                                        <span class="col">{{ props.row.category }}</span>
-                                        <span class="col text-center">{{ props.row.address }}</span>
-                                      </div>
-                                    </div>
+                                        <table-expend-list :data="props.row.child"></table-expend-list>
                                   </template>
                                 </el-table-column>
                                 <el-table-column
                                   label="一级分类"
-                                  prop="id">
+                                  prop="label">
                                 </el-table-column>
                                 <el-table-column
                                   label="二级分类"
@@ -167,7 +161,7 @@
                                 </el-table-column>
                                 <el-table-column
                                   label="金额"
-                                  prop="desc">
+                                  prop="amount">
                                 </el-table-column>
                               </el-table>
                             </template>
@@ -232,7 +226,11 @@
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
         <!-- import axios -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+          <!-- import componet.js -->
+        <script src="{{ url_for('static', filename='js/components.js') }}"></script>
       <script>
+
+          // vue
          new Vue({
           el: '#app',
           data: function() {
@@ -292,7 +290,8 @@
                       desc: '荷兰优质淡奶，奶香浓而不腻',
                       address: '上海市普陀区真北路',
                       shop: '王小虎夫妻店',
-                      shopId: '10333'
+                      shopId: '10333',
+                        child:[{id:1},{id:2}]
                     }, {
                       id: '12987123',
                       name: '好滋好味鸡蛋仔',
@@ -312,11 +311,6 @@
                     }, {
                       id: '12987126',
                       name: '好滋好味鸡蛋仔',
-                      category: '江浙小吃、小吃零食',
-                      desc: '荷兰优质淡奶，奶香浓而不腻',
-                      address: '上海市普陀区真北路',
-                      shop: '王小虎夫妻店',
-                      shopId: '10333'
                     }]
             }
           },
@@ -355,12 +349,17 @@
                   });
               },
               onSearch () {
+                  // 查账
+                  const _this = this
                   axios.post('/transaction/query',{
                       category: __eunm.categoryType,
+                      categoryObj: __eunm.getCategoryObj(),
                       ...this.formInline
                   })
                   .then(function (response) {
-                    console.log(response);
+                      const data = response.data
+                      console.log(this)
+                      _this.tableData = response.data.data || []
                   })
                   .catch(function (error) {
                     console.log(error);

@@ -109,10 +109,11 @@ def get_transaction_by_condition(query_con):
 def query():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data)
-    return_val = transform_data(list, data['category'])
+    return_val = transform_data(list, data['category'],  data['categoryObj'])
     return {'code':200, 'data': return_val}
 
-def transform_data(list, category):
+
+def transform_data(list, category, categoryObj):
 
     obj = {
         '00000':{
@@ -150,20 +151,25 @@ def transform_data(list, category):
         else:
             obj['00000']['amount'] += amount
 
-    return get_list_amount(obj)
+    return get_list_amount(obj, categoryObj)
 
-def get_list_amount(obj):
+def get_list_amount(obj, categoryObj):
     arr = []
+    print(type(categoryObj))
     for item in obj:
         child_arr = []
         new_obj = obj[item]
         new_obj['amount'] = str(new_obj['amount'])
-        new_obj['value'] = item
+        new_obj['id'] = item
+        new_obj['label'] = categoryObj[str(item)]
         if 'child' in new_obj.keys():
             child_obj = new_obj['child']
             for child_item in child_obj:
-                child_arr.append({'value': child_item, 'amount': str(child_obj[child_item])})
+                child_arr.append({
+                    'id': child_item,
+                    'label':  categoryObj[str(child_item)],
+                    'amount': str(child_obj[child_item])
+                })
             new_obj['child'] = child_arr
         arr.append(new_obj)
-    print(arr)
     return arr
