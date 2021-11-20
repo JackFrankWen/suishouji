@@ -133,6 +133,7 @@ def transform_data(list, category, categoryObj):
             arr = json.loads(item['category'])
             lvl1 = str(arr[0])
             lvl2 = str(arr[1])
+
             if lvl1 in obj.keys():
                 obj[lvl1]['amount'] += amount
             else:

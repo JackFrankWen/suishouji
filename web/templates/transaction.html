@@ -120,7 +120,7 @@
                                 </el-date-picker>
                               </el-form-item>
                                 <el-form-item label="消费成员" label-width="80px" >
-                                    <el-select v-model="formInline.consumer" placeholder="请选择标签">
+                                    <el-select v-model="formInline.consumer" placeholder="请选择成员">
                                       <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                                 </el-form-item>
@@ -167,12 +167,13 @@
                             </template>
                         </div>
                          <!--    改账  -->
-                        <div v-show="activeType===3">
-                            <h1 class="mt-4">改账</h1>
-                            <el-form :inline="true" :model="formInline" class="demo-form-inline">
-                              <el-form-item label="日期">
+                        <div v-show="activeType===3" class="p-2">
+                            <h1 class="mt-2">改账</h1>
+                            <bookkeep-alert-rule>
+                            </bookkeep-alert-rule>
+                            <el-form :inline="true" :model="formInline" class="demo-form-inline mt-2">
                                 <el-date-picker
-                                  v-model="formInline.picker"
+                                  v-model="batchQueryForm.picker"
                                   type="daterange"
                                   value-format="yyyy-MM-dd"
                                   @change="dateChange"
@@ -181,26 +182,106 @@
                                   end-placeholder="结束月份"
                                   :picker-options="formInline.pickerOptions">
                                 </el-date-picker>
-                              </el-form-item>
-                                <el-form-item label="消费成员" label-width="80px" >
-                                    <el-select v-model="formInline.consumer" placeholder="请选择标签">
-                                      <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item label="支付方式" label-width="80px" >
-                                    <el-select v-model="formInline.paymentType" placeholder="请选择支付方式">
-                                      <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
-                                    </el-select>
-                                </el-form-item>
-                                <el-form-item label="账户" label-width="80px" >
-                                    <el-select v-model="formInline.accountType" placeholder="请选择账户">
-                                      <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
-                                    </el-select>
-                                </el-form-item>
+                                <el-select v-model="batchQueryForm.consumer" placeholder="请选择成员">
+                                  <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                                </el-select>
+                                <el-select v-model="batchQueryForm.paymentType" placeholder="请选择付款方式">
+                                  <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
+                                </el-select>
+                                <el-select v-model="batchQueryForm.accountType" placeholder="请选择账户">
+                                  <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                                </el-select>
                               <el-form-item>
                                 <el-button type="primary" @click="onSearch">查询</el-button>
+                                  <el-button type="primary" icon="el-icon-edit">添加</el-button>
                               </el-form-item>
                             </el-form>
+                            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                               </el-form-item>
+                                    <el-cascader
+                                        placeholder="分类修改为"
+                                        clearable
+                                        v-model="batchUpdateForm.category"
+                                        :options="options"
+                                        filterable></el-cascader>
+                                    <el-select v-model="batchUpdateForm.consumer" placeholder="成员修改为">
+                                      <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                    <el-select v-model="batchUpdateForm.paymentType" placeholder="付款方式修改为">
+                                      <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                    <el-select v-model="batchUpdateForm.tag" placeholder="标签修改为">
+                                      <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                    <el-select v-model="batchUpdateForm.accountType" placeholder="账户修改为">
+                                      <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                              <el-form-item>
+                                <el-button type="primary" @click="onSubmit">确认修改</el-button>
+                              </el-form-item>
+                            </el-form>
+                            <el-table
+                                ref="multipleTable"
+                                :data="tableDataUpdate"
+                                tooltip-effect="dark"
+                                style="width: 100%"
+                                @selection-change="handleSelectionChange">
+                                <el-table-column
+                                  type="selection"
+                                  width="55">
+                                </el-table-column>
+                                <el-table-column
+                                  label="日期"
+                                  width="120">
+                                  <template slot-scope="scope">{{ scope.row.date }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="金额"
+                                  width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="分类"
+                                  width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="成员"
+                                  width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="账户"
+                                  width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="付款类型"
+                                  width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="name"
+                                  label="标签"
+                                 width="120">
+                                </el-table-column>
+                                <el-table-column
+                                  prop="address"
+                                  label="描述"
+                                  show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column
+                                  label="操作"
+                                 width="120">
+                                    <el-button size="mini">编辑</el-button>
+                                </el-table-column>
+                              </el-table>
+                            <div class="mt-2 text-center">
+                                <el-pagination
+                                  layout="prev, pager, next"
+                                  :total="1000">
+                                </el-pagination>
+                            </div>
                         </div>
                          <!--    分析  -->
                         <div v-show="activeType===4">
@@ -220,14 +301,8 @@
               >
                 <div class="demo-drawer__content">
                     <el-form :model="drawerForm">
-                      <el-alert
-                        title="标签规则"
-                        type="warning"
-                        description="1.日常消费（买菜，沃尔玛，工作餐）
-                        2.一次性消费（零食，购物衣服）
-                        3.固定消费（水电煤，加油费，理发，话费）"
-                        show-icon>
-                      </el-alert>
+                      <bookkeep-alert>
+                      </bookkeep-alert>
                       <el-form-item label="匹配规则" label-width="80px">
                         <el-input v-model="drawerForm.rule" placeholder="描述中包含字符时命中规则"></el-input>
                       </el-form-item>
@@ -307,6 +382,36 @@
                       }]
                     },
                 },
+                batchQueryForm: {// 查账
+                    picker: undefined,
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
+                    pickerOptions: {
+                      shortcuts: [{
+                        text: '本月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m, 1);
+                            const lastDay = new Date(y, m+1, 0);
+                            picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }, {
+                        text: '上个月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m-1, 1);
+                            const lastDay = new Date(y, m, 0);
+                          picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }]
+                    },
+                },
+                batchUpdateForm: {// 查账
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
+                },
                 drawerForm:{
                     category:'',
                     tag:'',
@@ -317,7 +422,37 @@
                 selectOptionConsumer: __eunm.getConsumer(),
                 selectOptionAccountType: __eunm.getAccountType(),
                 selectOptionPaymentType: __eunm.getPaymentType(),
-                tableData: []
+                tableData: [],
+                tableDataUpdate: [{
+                      date: '2016-05-03',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-02',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-04',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-01',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-08',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-06',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }, {
+                      date: '2016-05-07',
+                      name: '王小虎',
+                      address: '上海市普陀区金沙江路 1518 弄'
+                    }],
+                    multipleSelection: []
             }
           },
           methods: {
@@ -380,6 +515,12 @@
                   .catch(function (error) {
                     console.log(error);
                   });
+              },
+              toggleSelection() {
+                 this.$refs.multipleTable.clearSelection();
+              },
+              handleSelectionChange(val) {
+                  this.multipleSelection = val;
               },
               submit: function () {
                 //   var config = { headers: {
