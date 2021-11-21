@@ -62,20 +62,20 @@
                             <div class="row">
 
                                 <!--    form  -->
-                                <el-form ref="form" :model="form" label-width="80px">
+                                <el-form ref="formUpload" :model="formUpload" label-width="80px">
                                     <el-steps :active="activeStep" finish-status="success">
                                       <el-step title="第一步选择上传分类" description="选择上传方式"></el-step>
                                       <el-step title="第二步导入数据" description="选择上传文件"></el-step>
                                       <el-step title="第三步数据导入完成" description="查看导入数据"></el-step>
                                     </el-steps>
                                   <el-form-item v-show="activeStep===0"  label="导入方式">
-                                    <el-radio-group  v-model="form.paymentType">
+                                    <el-radio-group  v-model="formUpload.paymentType">
                                       <el-radio label="1" border>支付宝csv导入</el-radio>
                                       <el-radio label="2" border>微信csv导入</el-radio>
                                     </el-radio-group>
                                   </el-form-item>
                                   <el-form-item v-show="activeStep===0" label="消费账户">
-                                    <el-radio-group v-model="form.accountType">
+                                    <el-radio-group v-model="formUpload.accountType">
                                       <el-radio label="1" >老公钱包</el-radio>
                                       <el-radio label="2" >老婆钱包</el-radio>
                                     </el-radio-group>
@@ -182,18 +182,30 @@
                                   end-placeholder="结束月份"
                                   :picker-options="formInline.pickerOptions">
                                 </el-date-picker>
-                                <el-select v-model="batchQueryForm.consumer" placeholder="请选择成员">
+                                <el-select
+                                        clearable
+                                        v-model="batchQueryForm.consumer"
+                                        placeholder="请选择成员"
+                                >
                                   <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
-                                <el-select v-model="batchQueryForm.paymentType" placeholder="请选择付款方式">
+                                <el-select
+                                    v-model="batchQueryForm.paymentType"
+                                    placeholder="请选择付款方式"
+                                    clearable
+                                >
                                   <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
-                                <el-select v-model="batchQueryForm.accountType" placeholder="请选择账户">
+                                <el-select
+                                    v-model="batchQueryForm.accountType"
+                                    clearable
+                                    placeholder="请选择账户"
+                                >
                                   <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
                               <el-form-item>
-                                <el-button type="primary" @click="onSearch">查询</el-button>
-                                  <el-button type="primary" icon="el-icon-edit">添加</el-button>
+                                <el-button type="primary" @click="onSearchUpdate">查询</el-button>
+                                  <el-button type="primary" icon="el-icon-edit"  @click="onOpenTranscationDrawer(1)()">添加</el-button>
                               </el-form-item>
                             </el-form>
                             <el-form :inline="true" :model="formInline" class="demo-form-inline">
@@ -217,7 +229,7 @@
                                       <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                               <el-form-item>
-                                <el-button type="primary" @click="onSubmit">确认修改</el-button>
+                                <el-button type="primary" >确认修改</el-button>
                               </el-form-item>
                             </el-form>
                             <el-table
@@ -232,48 +244,64 @@
                                 </el-table-column>
                                 <el-table-column
                                   label="日期"
-                                  width="120">
-                                  <template slot-scope="scope">{{ scope.row.date }}</template>
+                                  align="center"
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.create_time) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
+                                  prop="amount"
                                   label="金额"
+                                  align="center"
                                   width="120">
                                 </el-table-column>
                                 <el-table-column
                                   prop="name"
                                   label="分类"
+                                  align="center"
                                   width="120">
+                                  <template slot-scope="scope">{{ __enum.getCategoryLabel(scope.row.category) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
+                                  prop="consumer"
                                   label="成员"
+                                  align="center"
                                   width="120">
+                                    <template slot-scope="scope">{{ __enum.getConsumerKey(scope.row.consumer) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
+                                  prop="account_type"
                                   label="账户"
+                                  align="center"
                                   width="120">
+                                    <template slot-scope="scope">{{ __enum.getAccountTypeKey(scope.row.account_type) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
-                                  label="付款类型"
+                                  prop="payment_type"
+                                  label="付款方式"
+                                  align="center"
                                   width="120">
+                                    <template slot-scope="scope">{{ __enum.getPaymentTypeKey(scope.row.payment_type) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
+                                  prop="tag"
                                   label="标签"
+                                  align="center"
                                  width="120">
+                                    <template slot-scope="scope">{{ __enum.getTagKey(scope.row.tag) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="address"
+                                  prop="description"
                                   label="描述"
+                                  align="center"
                                   show-overflow-tooltip>
                                 </el-table-column>
                                 <el-table-column
                                   label="操作"
                                  width="120">
-                                    <el-button size="mini">编辑</el-button>
+                                    <template slot-scope="scope">
+
+                                        <el-button size="mini" @click="onOpenTranscationDrawer(2)(scope.row)">编辑</el-button>
+                                    </template>
                                 </el-table-column>
                               </el-table>
                             <div class="mt-2 text-center">
@@ -300,7 +328,7 @@
               ref="drawer"
               >
                 <div class="demo-drawer__content">
-                    <el-form :model="drawerForm">
+                    <el-form ref="form" :model="formTransaction" label-width="80px">
                       <bookkeep-alert>
                       </bookkeep-alert>
                       <el-form-item label="匹配规则" label-width="80px">
@@ -311,7 +339,7 @@
                          </el-form-item>
                       <el-form-item label="标签" label-width="80px" >
                         <el-select v-model="drawerForm.tag" placeholder="请选择标签">
-                          <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
+                            <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
                         </el-select>
                       </el-form-item>
                     </el-form>
@@ -321,10 +349,89 @@
                     </div>
                 </div>
             </el-drawer>
+              <!--  drawer      -->
+            <el-drawer
+              :title="formTransaction.action===1 ? '新增' : '修改'"
+              :before-close="handleCloseTransaction"
+              :visible.sync="dialogTransaction"
+              custom-class="demo-drawer"
+              :size="Number(800)"
+              ref="drawerTransaction"
+              >
+                <div class="demo-drawer__content">
+                    <el-form ref="form" :model="formTransaction" label-width="80px">
+                          <el-form-item label="金额">
+                            <el-input v-model="formTransaction.amount" style="width: 220px"></el-input>
+                          </el-form-item>
+                           <el-form-item label="描述">
+                            <el-input
+                                    v-model="formTransaction.description"
+                                    type="textarea"
+                                    style="width: 220px"
+                            ></el-input>
+                          </el-form-item>
+                          <el-form-item label="日期">
+                            <el-date-picker
+                              v-model="formTransaction.create_time"
+                              type="date"
+                              placeholder="选择日期">
+                            </el-date-picker>
+                          </el-form-item>
+                          <el-form-item label="成员">
+                            <el-select
+                                clearable
+                                v-model="formTransaction.consumer"
+                                placeholder="请选择成员"
+                            >
+                              <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                            </el-select>
+                          </el-form-item>
+                         <el-form-item label="分类">
+                             <el-cascader
+                                        clearable
+                                        v-model="formTransaction.category"
+                                        :options="options"
+                                        filterable></el-cascader>
+                         </el-form-item>
+                         <el-form-item label="付款方式">
+                            <el-select
+                                v-model="formTransaction.payment_type"
+                                placeholder="请选择付款方式"
+                                clearable
+                            >
+                              <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
+                            </el-select>
+                         </el-form-item>
+                         <el-form-item label="账户">
+                            <el-select
+                                v-model="formTransaction.account_type"
+                                clearable
+                                placeholder="请选择账户"
+                            >
+                              <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                            </el-select>
+                         </el-form-item>
+                         <el-form-item label="标签">
+                            <el-select
+                                v-model="formTransaction.tag"
+                                clearable
+                            >
+                              <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
+                            </el-select>
+                         </el-form-item>
+
+                          <el-form-item>
+                            <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                            <el-button @click="handleClose">取消</el-button>
+                          </el-form-item>
+                        </el-form>
+                </div>
+            </el-drawer>
         </div>
         {% endraw %}
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
         <!-- dayjs -->
@@ -350,109 +457,27 @@
                 fileList: [],
                 activeType: 1,
                 dialog: false, // 抽屉
+                dialogTransaction: false, // 抽屉
                 loading: false,
                 activeStep: 0, // 步骤条
-                form: { // 入账
-                    accountType: '1',// 消费账户
-                    paymentType: '1',
-                },
-                formInline: {// 查账
-                    picker: undefined,
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                    pickerOptions: {
-                      shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m, 1);
-                            const lastDay = new Date(y, m+1, 0);
-
-                            picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }, {
-                        text: '上个月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m-1, 1);
-                            const lastDay = new Date(y, m, 0);
-                          picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }]
-                    },
-                },
-                batchQueryForm: {// 查账
-                    picker: undefined,
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                    pickerOptions: {
-                      shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m, 1);
-                            const lastDay = new Date(y, m+1, 0);
-                            picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }, {
-                        text: '上个月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m-1, 1);
-                            const lastDay = new Date(y, m, 0);
-                          picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }]
-                    },
-                },
-                batchUpdateForm: {// 查账
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                },
+                formUpload: __init.formUpload(),// 上传表单
+                formTransaction: __init.formTransaction(),
+                formInline: __init.formInline(), // 查账
+                batchQueryForm: __init.batchQueryForm(),
+                batchUpdateForm: __init.batchUpdateForm(),
                 drawerForm:{
                     category:'',
                     tag:'',
                     rule: '',
                 },
-                options: __eunm.categoryType,
-                selectOption: __eunm.getTag(),
-                selectOptionConsumer: __eunm.getConsumer(),
-                selectOptionAccountType: __eunm.getAccountType(),
-                selectOptionPaymentType: __eunm.getPaymentType(),
+                options: __enum.categoryType,
+                selectOption: __enum.getTag(),
+                selectOptionConsumer: __enum.getConsumer(),
+                selectOptionAccountType: __enum.getAccountType(),
+                selectOptionPaymentType: __enum.getPaymentType(),
                 tableData: [],
-                tableDataUpdate: [{
-                      date: '2016-05-03',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-02',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-04',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-01',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-08',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-06',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }, {
-                      date: '2016-05-07',
-                      name: '王小虎',
-                      address: '上海市普陀区金沙江路 1518 弄'
-                    }],
-                    multipleSelection: []
+                tableDataUpdate: [],
+                multipleSelection: []
             }
           },
           methods: {
@@ -461,9 +486,36 @@
                   val[1] = val[1] + "T23:59:59"
                   return val
               },
+              onOpenTranscationDrawer(action) {
+                  const _this = this;
+                    return function (data) {
+                        _this.dialogTransaction = true
+
+                        if(data) {
+                            _this.formTransaction = {
+                                create_time: new Date(data.create_time),
+                                category: JSON.parse(data.category) || [],
+                                ...data
+                            };
+                        }
+
+                        if(action === 1){
+                            _this.formTransaction = __init.formTransaction()
+                            _this.formTransaction.action = 1
+                        } else {
+                            _this.formTransaction.action = 2
+
+                        }
+
+                    }
+              },
               handleClose() {
                   this.loading = false;
                   this.dialog = false;
+              },
+              handleCloseTransaction() {
+                  this.loading = false;
+                  this.dialogTransaction = false;
               },
               getfileData() {
                     return {
@@ -503,14 +555,31 @@
                   // 查账
                   const _this = this
                   axios.post('/transaction/query',{
-                      category: __eunm.categoryType,
-                      categoryObj: __eunm.getCategoryObj(),
+                      category: __enum.categoryType,
+                      categoryObj: __enum.getCategoryObj(),
                       ...this.formInline
                   })
                   .then(function (response) {
                       const data = response.data
                       console.log(this)
                       _this.tableData = response.data.data || []
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              },
+              onSearchUpdate () {
+                  // 改账查询
+                  const _this = this
+                  axios.post('/transaction/query/detail',{
+                      category: __enum.categoryType,
+                      categoryObj: __enum.getCategoryObj(),
+                      ...this.batchQueryForm
+                  })
+                  .then(function (response) {
+                      const data = response.data
+                      console.log(this)
+                      _this.tableDataUpdate = response.data.data || []
                   })
                   .catch(function (error) {
                     console.log(error);
