@@ -11315,3 +11315,7 @@ body.sb-sidenav-toggled #wrapper #sidebar-wrapper {
     margin-left: -15rem;
   }
 }
+
+.demo-form .el-form {
+    width: 460px;
+}

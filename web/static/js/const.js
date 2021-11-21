@@ -3,7 +3,7 @@
 //     customer INT COMMENT '消费对象 1.家庭 2.老公 3.老婆 4.牧 ',
 //     tag INT COMMENT '标签 1.日常消费（买菜，沃尔玛） 2.一次性消费（零食，购物衣服） 3.固定消费（水电煤，油费，理发话费）'
 
-var __eunm = {
+var __enum = {
     accountType: {
         1: '老公钱包',
         2: '老婆钱包',
@@ -16,15 +16,39 @@ var __eunm = {
         4: '现金'
     },
     consumer: {
+        0: '未分类',
         1: '家庭',
         2: '老公',
         3: '老婆',
         4: '牧牧'
     },
+    tag: {
+        1: '日常消费',
+        2: '一次性消费',
+        3: '固定消费'
+    },
     transform: function (obj) {
         return Object.keys(obj).map(
             (key) => ({label: obj[key], value: Number(key)})
             )
+    },
+    safeMapping: function (key, obj) {
+        if (obj.hasOwnProperty(key)) {
+            return obj[key]
+        }
+        return '代码错误'
+    },
+    getConsumerKey: function(key){
+        return this.safeMapping(key, this.consumer)
+    },
+    getAccountTypeKey: function(key){
+        return this.safeMapping(key, this.accountType)
+    },
+    getPaymentTypeKey: function(key){
+         return this.safeMapping(key, this.paymentType)
+    },
+    getTagKey: function(key){
+        return this.safeMapping(key, this.tag)
     },
     getConsumer: function(){
         return this.transform(this.consumer)
@@ -34,11 +58,6 @@ var __eunm = {
     },
     getPaymentType: function(){
         return this.transform(this.paymentType)
-    },
-    tag: {
-        1: '日常消费',
-        2: '一次性消费',
-        3: '固定消费'
     },
     getTag: function(){
         return this.transform(this.tag)
@@ -52,6 +71,13 @@ var __eunm = {
             })
         })
         return obj
+    },
+    getCategoryLabel: function(json) {
+        if (json) {
+            const obj =  this.getCategoryObj();
+            const arr = JSON.parse(json)
+            return obj[arr[1]]
+        }
     },
     categoryType: [{
                   value: 10000,
@@ -98,7 +124,10 @@ var __eunm = {
                     label: '宠物支出',
                   }, {
                     value: 50007,
-                    label: '宝宝食品',
+                    label: '汽车用品',
+                  }, {
+                    value: 50008,
+                    label: '家具家电',
                   }]
                 }, {
                   value: 20000,
@@ -186,9 +215,132 @@ var __eunm = {
                     label: '孝敬长辈',
                   }]
                 }, {
+                  value: 70000,
+                  label: '休闲娱乐',
+                  children: [{
+                    value: 70001,
+                    label: '聚会',
+                  }, {
+                    value: 70002,
+                    label: '游戏（桌游）',
+                  }, {
+                    value: 70003,
+                    label: '其他娱乐',
+                  }]
+                }, {
+                  value: 80000,
+                  label: '保险医疗',
+                  children: [{
+                    value: 80001,
+                    label: '个人保险',
+                  }, {
+                    value: 80002,
+                    label: '医疗费用',
+                  }, {
+                    value: 80003,
+                    label: '其他娱乐',
+                  }]
+                }, {
+                  value: 90000,
+                  label: '个人投资',
+                  children: [{
+                    value: 90001,
+                    label: '摄影',
+                  }, {
+                    value: 90002,
+                    label: '书包杂志',
+                  }, {
+                    value: 90003,
+                    label: '个人投资',
+                  }]
+                }, {
                   value: '00000',
                   label: '未分类',
                   children: []
                 }
     ],
+}
+__init = {
+    formTransaction() {
+        return {
+                  create_time: undefined,
+                  category: undefined,
+                  consumer: undefined,
+                  payment_type: undefined,
+                  amount: undefined,
+                  account_type: undefined,
+                  tag: undefined,
+                  description: undefined,
+                    action: 1,//1 新建 2 修改
+                }
+    },
+    batchUpdateForm() {
+        return  {// 查账
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
+                }
+    },
+    formUpload() {
+        return { // 入账
+                    accountType: '1',// 消费账户
+                    paymentType: '1',
+                }
+    },
+    formInline() {
+        return  {// 查账
+                    picker: undefined,
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
+                    pickerOptions: {
+                      shortcuts: [{
+                        text: '本月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m, 1);
+                            const lastDay = new Date(y, m+1, 0);
+
+                            picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }, {
+                        text: '上个月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m-1, 1);
+                            const lastDay = new Date(y, m, 0);
+                          picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }]
+                    },
+                }
+    },
+    batchQueryForm() {
+        return {// 查账
+                    picker: undefined,
+                    paymentType: undefined,
+                    accountType: undefined,
+                    consumer: undefined,
+                    pickerOptions: {
+                      shortcuts: [{
+                        text: '本月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m, 1);
+                            const lastDay = new Date(y, m+1, 0);
+                            picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }, {
+                        text: '上个月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m-1, 1);
+                            const lastDay = new Date(y, m, 0);
+                          picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }]
+                    },
+                }
+    },
+
 }

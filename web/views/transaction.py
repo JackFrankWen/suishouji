@@ -56,12 +56,13 @@ def upload_file():
             data['account_type'] = request.form['accountType']
             data['payment_type'] = request.form['paymentType']
             data = load_rule_data(data)
-            print(data)
             to_mysql(data)
             return 'file uploaded successfully'
-    return 'sssssssssss'
+    return {'code': 200}
+
 
 def load_rule_data(data):
+
     ruleData = get_all_rule()
     for row in ruleData:
 
@@ -72,6 +73,7 @@ def load_rule_data(data):
 
 
 def get_all_rule():
+
     query = "SELECT * FROM match_rules "
     return query_mysql(query, '')
 
@@ -111,7 +113,15 @@ def query():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data)
     return_val = transform_data(list, data['category'],  data['categoryObj'])
-    return {'code':200, 'data': return_val}
+    return {'code': 200, 'data': return_val}
+
+
+@transaction_blueprint.route("/transaction/query/detail", methods=['POST'])
+def query_detail():
+    data = request.get_json(force=True)
+    list = get_transaction_by_condition(data)
+    # return_val = transform_data(list, data['category'],  data['categoryObj'])
+    return {'code': 200, 'data': list}
 
 
 def transform_data(list, category, categoryObj):
