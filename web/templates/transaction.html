@@ -456,25 +456,27 @@
                 expands: [],
                 fileList: [],
                 activeType: 1,
+
                 dialog: false, // 抽屉
                 dialogTransaction: false, // 抽屉
                 loading: false,
                 activeStep: 0, // 步骤条
+
+
                 formUpload: __init.formUpload(),// 上传表单
                 formTransaction: __init.formTransaction(),
                 formInline: __init.formInline(), // 查账
                 batchQueryForm: __init.batchQueryForm(),
                 batchUpdateForm: __init.batchUpdateForm(),
-                drawerForm:{
-                    category:'',
-                    tag:'',
-                    rule: '',
-                },
+                drawerForm:__init.drawerForm(),
+
                 options: __enum.categoryType,
                 selectOption: __enum.getTag(),
                 selectOptionConsumer: __enum.getConsumer(),
                 selectOptionAccountType: __enum.getAccountType(),
                 selectOptionPaymentType: __enum.getPaymentType(),
+
+
                 tableData: [],
                 tableDataUpdate: [],
                 multipleSelection: []

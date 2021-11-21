@@ -260,6 +260,26 @@ var __enum = {
                 }
     ],
 }
+
+pickerOptions = {
+                      shortcuts: [{
+                        text: '本月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m, 1);
+                            const lastDay = new Date(y, m+1, 0);
+                            picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }, {
+                        text: '上个月',
+                        onClick(picker) {
+                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                            const firstDay = new Date(y, m-1, 1);
+                            const lastDay = new Date(y, m, 0);
+                          picker.$emit('pick', [firstDay, lastDay]);
+                        }
+                      }]
+                    }
 __init = {
     formTransaction() {
         return {
@@ -287,32 +307,20 @@ __init = {
                     paymentType: '1',
                 }
     },
+    drawerForm() {
+        return {
+                    category:'',
+                    tag:'',
+                    rule: '',
+                }
+    },
     formInline() {
         return  {// 查账
                     picker: undefined,
                     paymentType: undefined,
                     accountType: undefined,
                     consumer: undefined,
-                    pickerOptions: {
-                      shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m, 1);
-                            const lastDay = new Date(y, m+1, 0);
-
-                            picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }, {
-                        text: '上个月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m-1, 1);
-                            const lastDay = new Date(y, m, 0);
-                          picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }]
-                    },
+                    pickerOptions: pickerOptions,
                 }
     },
     batchQueryForm() {
@@ -321,26 +329,10 @@ __init = {
                     paymentType: undefined,
                     accountType: undefined,
                     consumer: undefined,
-                    pickerOptions: {
-                      shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m, 1);
-                            const lastDay = new Date(y, m+1, 0);
-                            picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }, {
-                        text: '上个月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m-1, 1);
-                            const lastDay = new Date(y, m, 0);
-                          picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }]
-                    },
+                    pickerOptions: pickerOptions,
                 }
     },
 
 }
+
+
