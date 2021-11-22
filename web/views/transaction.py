@@ -82,28 +82,23 @@ def get_transaction_by_condition(query_con):
     query_clause = "SELECT * FROM transaction "
     query_value = ''
     condition = ''
-    if 'picker' in query_con.keys():
-        condition = "WHERE create_time BETWEEN %s AND %s"
-        query_value = [query_con['picker'][0], query_con['picker'][1]]
-    if 'accountType' in query_con.keys():
+    if query_con.get('picker'):
+        condition = 'WHERE create_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
+        # query_value = [query_con['picker'][0], query_con['picker'][1]]
+    if query_con.get('accountType'):
         if not condition:
-            condition = "WHERE accountType = %s"
-            query_value.append(query_con['accountType'])
+            condition = "WHERE account_type = {}".format(query_con.get('accountType'))
         else:
-            condition += "AND accountType = %s"
-            query_value = [query_con['accountType']]
+            condition += " AND account_type = {}".format(query_con.get('accountType'))
 
-    if 'paymentType' in query_con.keys():
+    if query_con.get('paymentType'):
         if not condition:
-            condition = "WHERE paymentType = %s"
-            query_value.append(query_con['accountType'])
+            condition = "WHERE payment_type = {}".format(query_con.get('paymentType'))
         else:
-            condition += "AND paymentType = %s"
-            query_value = [query_con['paymentType']]
+            condition += " AND payment_type = {}".format(query_con.get('paymentType'))
 
     query_clause += condition
-    return query_mysql(query_clause, tuple(query_value))
-    # return query_mysql(query_clause, '')
+    return query_mysql(query_clause, '')
 
 
 
@@ -264,6 +259,7 @@ def batch_update_transcation(data):
     sql_list = str(tuple([key for key in data['ids']])).replace(',)', ')')
 
     query_str = ''
+
     if data.get('category'):
         query_str = 'category = "{}"'.format(data.get('category'))
     if data.get('accountType'):

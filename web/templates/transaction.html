@@ -319,7 +319,12 @@
                             <div class="mt-2 text-center">
                                 <el-pagination
                                   layout="prev, pager, next"
-                                  :total="1000">
+                                  @size-change="handleSizeChange"
+                                  @current-change="handleCurrentChange"
+                                  :current-page="pagination.currentPage"
+                                  :page-size=" pagination.pageSize"
+                                  :hide-on-single-page="true"
+                                  :total="pagination.total">
                                 </el-pagination>
                             </div>
                         </div>
@@ -470,7 +475,12 @@
                 expands: [],
                 fileList: [],
                 activeType: 1,
+                pagination: {
 
+                    currentPage: 1,
+                    pageSize: 20,
+                    total: 0,
+                },
                 dialog: false, // 抽屉
                 dialogTransaction: false, // 抽屉
                 loading: false,
@@ -497,6 +507,12 @@
             }
           },
           methods: {
+              handleSizeChange(val) {
+                console.log(`每页 ${val} 条`);
+              },
+              handleCurrentChange(val) {
+                console.log(`当前页: ${val}`);
+              },
               dateChange(val){
                   val[0] = val[0] + "T00:00:00"
                   val[1] = val[1] + "T23:59:59"
@@ -601,6 +617,7 @@
                   axios.post('/transaction/query/detail',{
                       category: __enum.categoryType,
                       categoryObj: __enum.getCategoryObj(),
+                      pagination: this.pagination,
                       ...this.batchQueryForm
                   })
                   .then(function (response) {
