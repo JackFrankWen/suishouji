@@ -119,9 +119,9 @@ def query():
 def create_or_update():
     data = request.get_json(force=True)
     if (data['action'] == 1):
-        inser_transcation(data)
+        insert_transcation(data)
     elif data['action'] == 2:
-        print('aaa')
+        update_transcation(data)
     return {'code': 200}
 
 
@@ -193,7 +193,8 @@ def get_list_amount(obj, categoryObj):
         arr.append(new_obj)
     return arr
 
-def inser_transcation(data):
+
+def insert_transcation(data):
     query_clause = ("INSERT INTO transaction"
                   "("
                     "flow_type,"
@@ -227,3 +228,26 @@ def inser_transcation(data):
         'tag': data['tag']
     }
     return  run_mysql(query_clause, query_value)
+
+
+def update_transcation(data):
+    query_clause = ("UPDATE transaction "
+           "SET description = %(description)s,"
+                    "category = %(category)s,"
+                    "payment_type = %(payment_type)s,"
+                    "consumer = %(consumer)s,"
+                    "create_time = %(create_time)s,"
+                    "tag = %(tag)s,"
+                    "account_type = %(account_type)s "
+           "WHERE id = %(id)s")
+    query_value = {
+        'id': data['id'],
+        'category': json.dumps(data['category']),
+        'description': data['description'],
+        'account_type': data['account_type'],
+        'payment_type': data['payment_type'],
+        'consumer': data['consumer'],
+        'create_time': data['create_time'],
+        'tag': data['tag']
+    }
+    return run_mysql(query_clause, query_value)

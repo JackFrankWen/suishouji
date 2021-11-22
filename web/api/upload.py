@@ -83,8 +83,11 @@ def read_data(csv):
     newData.loc[(newData['type'].str.contains("收入")), "flow_type"] = '2'
     # newData.loc[(newData['type'].str.contains("其他")), "flow_type"] = '3'
     # newData = newData.drop(newData[newData.flow_type == "3"].index)
+
     newData = newData.drop(newData[newData['status'].str.contains("交易关闭")].index)
     newData = newData[newData["status"].str.contains("交易关闭") == False]
+
+
     newData = newData[newData["type"].str.contains("其他") == False]
     newData = newData.drop(columns=[
         'paymentTime',  # 付款时间----
