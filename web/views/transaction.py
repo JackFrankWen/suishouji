@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql
 from web.api.upload import read_data, to_mysql
-import decimal
 
 import json
 import  decimal
@@ -116,19 +115,28 @@ def query():
     return {'code': 200, 'data': return_val}
 
 
+@transaction_blueprint.route("/transcation/createorupdate", methods=['POST'])
+def create_or_update():
+    data = request.get_json(force=True)
+    if (data['action'] == 1):
+        inser_transcation(data)
+    elif data['action'] == 2:
+        print('aaa')
+    return {'code': 200}
+
+
 @transaction_blueprint.route("/transaction/query/detail", methods=['POST'])
 def query_detail():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data)
-    # return_val = transform_data(list, data['category'],  data['categoryObj'])
     return {'code': 200, 'data': list}
 
 
 def transform_data(list, category, categoryObj):
 
     obj = {
-        '00000':{
-            'amount':decimal.Decimal(0)
+        '00000': {
+            'amount': decimal.Decimal(0)
         },
         '10000': {
             'amount': decimal.Decimal(0),
@@ -184,3 +192,38 @@ def get_list_amount(obj, categoryObj):
             new_obj['child'] = child_arr
         arr.append(new_obj)
     return arr
+
+def inser_transcation(data):
+    query_clause = ("INSERT INTO transaction"
+                  "("
+                    "flow_type,"
+                    "amount, "
+                    "category, "
+                    "description, "
+                    "account_type, "
+                    "payment_type, "
+                    "consumer, "
+                    "create_time, "
+                    "tag) "
+                  "VALUES ("
+                    "%(flow_type)s,"
+                    "%(amount)s, "
+                    "%(category)s, "
+                    "%(description)s, "
+                    "%(account_type)s, "
+                    "%(payment_type)s, "
+                    "%(consumer)s,"
+                    "%(create_time)s, "
+                    "%(tag)s)")
+    query_value = {
+        'amount': data['amount'],
+        'flow_type': 1,
+        'category': json.dumps(data['category']),
+        'description': data['description'],
+        'account_type': data['account_type'],
+        'payment_type': data['payment_type'],
+        'consumer': data['consumer'],
+        'create_time': data['create_time'],
+        'tag': data['tag']
+    }
+    return  run_mysql(query_clause, query_value)

@@ -370,10 +370,12 @@
                                     style="width: 220px"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="日期">
+                          <el-form-item label="日期" >
                             <el-date-picker
                               v-model="formTransaction.create_time"
-                              type="date"
+                              type="datetime"
+                              value-format="yyyy-MM-dd HH:mm"
+                               default-time="12:00:00"
                               placeholder="选择日期">
                             </el-date-picker>
                           </el-form-item>
@@ -421,7 +423,7 @@
                          </el-form-item>
 
                           <el-form-item>
-                            <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                            <el-button type="primary" @click="drawerSubmitTransaction" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
                             <el-button @click="handleClose">取消</el-button>
                           </el-form-item>
                         </el-form>
@@ -488,7 +490,22 @@
                   val[1] = val[1] + "T23:59:59"
                   return val
               },
-              
+              drawerSubmitTransaction() {
+                   const _this = this;
+                   this.loading = true;
+                  axios.post('/transcation/createorupdate',{ ...this.formTransaction},)
+                  .then(function (response) {
+                      _this.formTransaction = __init.formTransaction()
+                      _this.loading = false;
+                       _this.$message({
+                          message: '提交成功',
+                          type: 'success'
+                        })
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              },
               onOpenTranscationDrawer(action) {
                   const _this = this;
                     return function (data) {
