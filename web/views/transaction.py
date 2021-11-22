@@ -124,6 +124,12 @@ def create_or_update():
         update_transcation(data)
     return {'code': 200}
 
+@transaction_blueprint.route("/transaction/batch/update", methods=['POST'])
+def batch_update():
+    data = request.get_json(force=True)
+    batch_update_transcation(data)
+    return {'code': 200}
+
 
 @transaction_blueprint.route("/transaction/query/detail", methods=['POST'])
 def query_detail():
@@ -231,6 +237,7 @@ def insert_transcation(data):
 
 
 def update_transcation(data):
+    # 单个更行
     query_clause = ("UPDATE transaction "
            "SET description = %(description)s,"
                     "category = %(category)s,"
@@ -248,6 +255,26 @@ def update_transcation(data):
         'payment_type': data['payment_type'],
         'consumer': data['consumer'],
         'create_time': data['create_time'],
+        'tag': data['tag']
+    }
+    return run_mysql(query_clause, query_value)
+
+###
+### 批量更新
+def batch_update_transcation(data):
+    sql_list = str(tuple([key for key in data['ids']])).replace(',)', ')')
+    query_clause = ("UPDATE transaction "
+           "SET category = %(category)s,"
+                    "payment_type = %(payment_type)s,"
+                    "consumer = %(consumer)s,"
+                    "tag = %(tag)s,"
+                    "account_type = %(account_type)s "
+           "WHERE id IN {sql_list}").format(sql_list=sql_list)
+    query_value = {
+        'category': json.dumps(data['category']),
+        'account_type': data['accountType'],
+        'payment_type': data['paymentType'],
+        'consumer': data['consumer'],
         'tag': data['tag']
     }
     return run_mysql(query_clause, query_value)

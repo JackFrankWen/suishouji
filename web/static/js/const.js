@@ -36,7 +36,7 @@ var __enum = {
         if (obj.hasOwnProperty(key)) {
             return obj[key]
         }
-        return '代码错误'
+        return ''
     },
     getConsumerKey: function(key){
         return this.safeMapping(key, this.consumer)
