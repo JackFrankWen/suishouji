@@ -216,16 +216,28 @@
                                         v-model="batchUpdateForm.category"
                                         :options="options"
                                         filterable></el-cascader>
-                                    <el-select v-model="batchUpdateForm.consumer" placeholder="成员修改为">
+                                    <el-select
+                                            clearable
+                                            v-model="batchUpdateForm.consumer"
+                                            placeholder="成员修改为">
                                       <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
-                                    <el-select v-model="batchUpdateForm.paymentType" placeholder="付款方式修改为">
+                                    <el-select
+                                            clearable
+                                            v-model="batchUpdateForm.paymentType"
+                                            placeholder="付款方式修改为">
                                       <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
-                                    <el-select v-model="batchUpdateForm.tag" placeholder="标签修改为">
+                                    <el-select
+                                        clearable
+                                        v-model="batchUpdateForm.tag"
+                                        placeholder="标签修改为">
                                       <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
-                                    <el-select v-model="batchUpdateForm.accountType" placeholder="账户修改为">
+                                    <el-select
+                                        clearable
+                                        v-model="batchUpdateForm.accountType"
+                                        placeholder="账户修改为">
                                       <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                               <el-form-item>

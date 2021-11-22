@@ -259,22 +259,33 @@ def update_transcation(data):
     }
     return run_mysql(query_clause, query_value)
 
-###
-### 批量更新
+
 def batch_update_transcation(data):
     sql_list = str(tuple([key for key in data['ids']])).replace(',)', ')')
+
+    query_str = ''
+    if data.get('category'):
+        query_str = 'category = "{}"'.format(data.get('category'))
+    if data.get('accountType'):
+        if query_str:
+            query_str += ','
+        query_str += "account_type = {}".format(data.get('accountType'))
+    if data.get('consumer'):
+        if query_str:
+            query_str += ','
+        query_str += "consumer = {}".format(data.get('consumer'))
+    if data.get('paymentType'):
+        if query_str:
+            query_str += ','
+        query_str += "payment_type = {}".format(data.get('paymentType'))
+    if data.get('tag'):
+        if query_str:
+            query_str += ','
+        query_str += "tag = {}".format(data.get('tag'))
+
     query_clause = ("UPDATE transaction "
-           "SET category = %(category)s,"
-                    "payment_type = %(payment_type)s,"
-                    "consumer = %(consumer)s,"
-                    "tag = %(tag)s,"
-                    "account_type = %(account_type)s "
-           "WHERE id IN {sql_list}").format(sql_list=sql_list)
-    query_value = {
-        'category': json.dumps(data['category']),
-        'account_type': data['accountType'],
-        'payment_type': data['paymentType'],
-        'consumer': data['consumer'],
-        'tag': data['tag']
-    }
-    return run_mysql(query_clause, query_value)
+                    "SET {query_str} "
+                    "WHERE id IN {sql_list}").format(query_str=query_str, sql_list=sql_list)
+
+
+    return run_mysql(query_clause, '')
