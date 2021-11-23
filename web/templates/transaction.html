@@ -255,10 +255,11 @@
                                   width="55">
                                 </el-table-column>
                                 <el-table-column
-                                  label="日期"
+                                  prop="name"
+                                  label="分类"
                                   align="center"
-                                  width="140">
-                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.create_time) }}</template>
+                                  width="120">
+                                  <template slot-scope="scope">{{ __enum.getCategoryLabel(scope.row.category) }}</template>
                                 </el-table-column>
                                 <el-table-column
                                   prop="amount"
@@ -267,11 +268,10 @@
                                   width="120">
                                 </el-table-column>
                                 <el-table-column
-                                  prop="name"
-                                  label="分类"
+                                  prop="description"
+                                  label="描述"
                                   align="center"
-                                  width="120">
-                                  <template slot-scope="scope">{{ __enum.getCategoryLabel(scope.row.category) }}</template>
+                                  show-overflow-tooltip>
                                 </el-table-column>
                                 <el-table-column
                                   prop="consumer"
@@ -302,24 +302,29 @@
                                     <template slot-scope="scope">{{ __enum.getTagKey(scope.row.tag) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  prop="description"
-                                  label="描述"
+                                  label="日期"
                                   align="center"
-                                  show-overflow-tooltip>
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.create_time) }}</template>
                                 </el-table-column>
                                 <el-table-column
                                   label="操作"
-                                 width="120">
+                                 >
                                     <template slot-scope="scope">
 
                                         <el-button size="mini" @click="onOpenTranscationDrawer(2)(scope.row)">编辑</el-button>
+                                        <el-popconfirm
+                                          title="确认删除？"
+                                          @confirm="onDeleteTranction()(scope.row)"
+                                        >
+                                          <el-button size="mini"  slot="reference">删除</el-button>
+                                        </el-popconfirm>
                                     </template>
                                 </el-table-column>
                               </el-table>
                             <div class="mt-2 text-center">
                                 <el-pagination
                                   layout="prev, pager, next"
-                                  @size-change="handleSizeChange"
                                   @current-change="handleCurrentChange"
                                   :current-page="pagination.currentPage"
                                   :page-size=" pagination.pageSize"
@@ -507,16 +512,29 @@
             }
           },
           methods: {
-              handleSizeChange(val) {
-                console.log(`每页 ${val} 条`);
-              },
               handleCurrentChange(val) {
-                console.log(`当前页: ${val}`);
+                this.pagination.currentPage = val
+                this.onSearchUpdate()
               },
               dateChange(val){
                   val[0] = val[0] + "T00:00:00"
                   val[1] = val[1] + "T23:59:59"
                   return val
+              },
+              onDeleteTranction() {
+                  const _this = this
+                  return function (row) {
+                            axios.post('/transcation/delete',{ id: row.id},)
+                            .then(function (response) {
+                                   _this.$message({
+                                      message: '删除成功',
+                                      type: 'success'
+                                   })
+                                   _this.onSearchUpdate()
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                  }
               },
               drawerSubmitTransaction() {
                    const _this = this;
@@ -597,7 +615,7 @@
               onSearch () {
                   // 查账
                   const _this = this
-                  axios.post('/transaction/query',{
+                  axios.post('/transaction/query/category',{
                       category: __enum.categoryType,
                       categoryObj: __enum.getCategoryObj(),
                       ...this.formInline
@@ -612,18 +630,23 @@
                   });
               },
               onSearchUpdate () {
-                  // 改账查询
+                  // 改账页面查询
                   const _this = this
                   axios.post('/transaction/query/detail',{
                       category: __enum.categoryType,
                       categoryObj: __enum.getCategoryObj(),
-                      pagination: this.pagination,
+                      ...this.pagination,
                       ...this.batchQueryForm
                   })
                   .then(function (response) {
                       const data = response.data
                       console.log(this)
                       _this.tableDataUpdate = response.data.data || []
+                       _this.pagination = {
+                          total: response.data.total,
+                          pageSize: response.data.pageSize,
+                          currentPage: response.data.currentPage
+                      }
                   })
                   .catch(function (error) {
                     console.log(error);
@@ -640,7 +663,8 @@
                       _this.$message({
                           message: '提交成功',
                           type: 'success'
-                        })
+                      })
+                      _this.onSearchUpdate()
                   })
                   .catch(function (error) {
                     console.log(error);
@@ -650,7 +674,6 @@
                  this.$refs.multipleTable.clearSelection();
               },
               handleSelectionChange(val) {
-                  console.log(val)
                   this.multipleSelection = val.map(row=>row.id);
               },
               submit: function () {

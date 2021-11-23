@@ -77,37 +77,46 @@ def get_all_rule():
     return query_mysql(query, '')
 
 
-def get_transaction_by_condition(query_con):
+def get_transaction_by_condition(query_con, pagination):
 
-    query_clause = "SELECT * FROM transaction "
-    query_value = ''
     condition = ''
     if query_con.get('picker'):
-        condition = 'WHERE create_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
+        condition = ' WHERE create_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
         # query_value = [query_con['picker'][0], query_con['picker'][1]]
     if query_con.get('accountType'):
         if not condition:
-            condition = "WHERE account_type = {}".format(query_con.get('accountType'))
+            condition = " WHERE account_type = {}".format(query_con.get('accountType'))
         else:
             condition += " AND account_type = {}".format(query_con.get('accountType'))
 
     if query_con.get('paymentType'):
         if not condition:
-            condition = "WHERE payment_type = {}".format(query_con.get('paymentType'))
+            condition = " WHERE payment_type = {}".format(query_con.get('paymentType'))
         else:
             condition += " AND payment_type = {}".format(query_con.get('paymentType'))
+    if query_con.get('currentPage'):
+        offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
+        condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
 
+    query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction"
     query_clause += condition
-    return query_mysql(query_clause, '')
+    return query_mysql(query_clause, '', pagination)
 
 
 
-@transaction_blueprint.route("/transaction/query", methods=['POST'])
-def query():
+@transaction_blueprint.route("/transaction/query/category", methods=['POST'])
+def query_category():
     data = request.get_json(force=True)
-    list = get_transaction_by_condition(data)
+    list = get_transaction_by_condition(data,False)
     return_val = transform_data(list, data['category'],  data['categoryObj'])
     return {'code': 200, 'data': return_val}
+
+
+@transaction_blueprint.route("/transcation/delete", methods=['POST'])
+def delete():
+    data = request.get_json(force=True)
+    delete_by_id(data.get('id'))
+    return {'code': 200}
 
 
 @transaction_blueprint.route("/transcation/createorupdate", methods=['POST'])
@@ -128,9 +137,18 @@ def batch_update():
 
 @transaction_blueprint.route("/transaction/query/detail", methods=['POST'])
 def query_detail():
+
     data = request.get_json(force=True)
-    list = get_transaction_by_condition(data)
-    return {'code': 200, 'data': list}
+    list = get_transaction_by_condition(data, True)
+
+
+    return {
+        'code': 200,
+        'data': list.get('data'),
+        'total': list.get('total'),
+        'currentPage': data.get('currentPage'),
+        'pageSize': data.get('pageSize'),
+    }
 
 
 def transform_data(list, category, categoryObj):
@@ -283,5 +301,9 @@ def batch_update_transcation(data):
                     "SET {query_str} "
                     "WHERE id IN {sql_list}").format(query_str=query_str, sql_list=sql_list)
 
+    return run_mysql(query_clause, '')
 
+
+def delete_by_id(query_id):
+    query_clause = 'DELETE FROM transaction WHERE id ={}'.format(query_id)
     return run_mysql(query_clause, '')

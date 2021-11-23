@@ -24,7 +24,8 @@ def run_mysql(sql,data):
         else:
             print(err)
 
-def query_mysql(sql,data):
+
+def query_mysql(sql,data, pagination=False):
     try:
         conn = mysql.connector.connect(
             user=mysql_config['user'],
@@ -35,6 +36,11 @@ def query_mysql(sql,data):
         cur.execute(sql, data)
         columns = cur.description
         result = [{columns[index][0]: column for index, column in enumerate(value)} for value in cur.fetchall()]
+        print(result)
+        if pagination:
+            cur.execute('SELECT FOUND_ROWS()', '')
+            (total_rows,) = cur.fetchone()
+            result = {'data': result, 'total': total_rows}
         cur.close()
         conn.close()
         return result
