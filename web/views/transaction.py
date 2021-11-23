@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql
-from web.api.upload import read_data, to_mysql
+from web.api.upload import read_data, to_mysql, read_data_wetchat
 
 import json
 import  decimal
@@ -51,11 +51,19 @@ def upload_file():
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file:
-            data = read_data(file)
-            data['account_type'] = request.form['accountType']
-            data['payment_type'] = request.form['paymentType']
-            data = load_rule_data(data)
-            to_mysql(data)
+            if int(request.form['paymentType']) == 1:
+
+                data = read_data(file)
+                data['account_type'] = request.form['accountType']
+                data['payment_type'] = request.form['paymentType'] #导入长
+                data = load_rule_data(data)
+                to_mysql(data)
+            else:
+                data = read_data_wetchat(file)
+                data['account_type'] = request.form['accountType']
+                data['payment_type'] = request.form['paymentType']  # 导入长
+                data = load_rule_data(data)
+                to_mysql(data)
             return 'file uploaded successfully'
     return {'code': 200}
 
