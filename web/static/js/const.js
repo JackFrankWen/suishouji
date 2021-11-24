@@ -305,6 +305,7 @@ __init = {
         return { // 入账
                     accountType: '1',// 消费账户
                     paymentType: '1',
+                    fileList:[],
                 }
     },
     drawerForm() {

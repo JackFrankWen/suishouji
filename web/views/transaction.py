@@ -49,7 +49,6 @@ def update_rule_by_id( data):
         data.get('tag'),
         data.get('id'),
     )
-    print(query_clause, 'ddd')
     return run_mysql(query_clause, '')
 
 def insert_rule_table(data):

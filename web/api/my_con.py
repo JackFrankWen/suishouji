@@ -36,7 +36,6 @@ def query_mysql(sql,data, pagination=False):
         cur.execute(sql, data)
         columns = cur.description
         result = [{columns[index][0]: column for index, column in enumerate(value)} for value in cur.fetchall()]
-        print(result)
         if pagination:
             cur.execute('SELECT FOUND_ROWS()', '')
             (total_rows,) = cur.fetchone()

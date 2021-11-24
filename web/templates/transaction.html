@@ -86,19 +86,22 @@
                                       drag
                                       action="http://localhost:5000/upload"
                                       ref="upload"
+                                      :on-success="onUploadSuccess"
                                       :data="getfileData()"
                                       :auto-upload="false"
-                                      :file-list="fileList"
+                                      :file-list="formUpload.fileList"
                                       >
-                                      <i class="el-icon-upload"></i>
-                                      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                        <i class="el-icon-upload"></i>
+                                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                        <div class="el-upload__tip" slot="tip">请上传<span class="fw-bolder link-danger">{{ formUpload.paymentType == 1 ? '支付宝': '微信'}}</span>下载的csv文件</div>
                                     </el-upload>
                                     </el-checkbox-group>
                                   </el-form-item>
                                   <el-form-item>
-                                      <el-button type="primary"  @click="next">下一步</el-button>
-                                       <el-button  @click="submit">主要按钮</el-button>
-                                      <el-button @click="dialog = true">添加规则</el-button>
+                                      <el-button type="primary" v-if="activeStep==0"   @click="next">下一步</el-button>
+                                       <el-button type="primary" v-if="activeStep==1" @click="submit">上传数据</el-button>
+                                      <el-button v-if="activeStep==1"   @click="prev">上一步</el-button>
+                                      <el-button v-if="activeStep==0"  @click="dialog = true">添加规则</el-button>
                                   </el-form-item>
                                 </el-form>
                             </div>
@@ -315,10 +318,9 @@
                                         <el-button size="mini" @click="onOpenTranscationDrawer(2)(scope.row)">编辑</el-button>
                                         <el-popconfirm
                                           title="确认删除？"
-                                          @confirm="onDeleteTranction()(scope.row)"
-                                                      >
-      ze="mini"  slot="reference">删除</el-button>
-                                        </el-popconfirm>
+                                          @confirm="onDeleteTranction()(scope.row)">
+                                            <el-button size="mini" slot="reference">删除</el-button>
+                                         </el-popconfirm>
                                     </template>
                                 </el-table-column>
                               </el-table>
@@ -364,11 +366,11 @@
                             <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
                         </el-select>
                       </el-form-item>
+                        <el-form-item class="demo-drawer__footer">
+                            <el-button @click="handleClose">取 消</el-button>
+                            <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                        </el-form-item>
                     </el-form>
-                    <div class="demo-drawer__footer">
-                        <el-button @click="handleClose">取 消</el-button>
-                        <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
-                    </div>
                 </div>
             </el-drawer>
               <!--  drawer      -->
@@ -516,6 +518,14 @@
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
               },
+              onUploadSuccess(res){
+                  this.activeStep = 3;
+                  console.log(res)
+                  this.$message({
+                                      message: '上传成功',
+                                      type: 'success'
+                                   })
+              },
               onChangeTabs(val){
                      if(val === 1){
                           this.formUpload = __init.formUpload()
@@ -550,10 +560,12 @@
                   .then(function (response) {
                       _this.formTransaction = __init.formTransaction()
                       _this.loading = false;
+                      _this.dialogTransaction = false;
+                      _this.onSearchUpdate()
                        _this.$message({
                           message: '提交成功',
                           type: 'success'
-                        })
+                       })
                   })
                   .catch(function (error) {
                     console.log(error);
@@ -597,6 +609,9 @@
               },
               next() {
                 if (this.activeStep++ > 2) this.activeStep = 0;
+              },
+              prev() {
+                this.activeStep--;
               },
               clickRowHandle(row, column, event) {
                   if (this.expands.includes(row.id)) {
