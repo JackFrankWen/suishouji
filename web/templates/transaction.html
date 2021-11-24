@@ -165,6 +165,7 @@
                                 <el-table-column
                                   label="金额"
                                   prop="amount">
+                                     <template slot-scope="scope">{{__utils.numFormat(scope.row.amount)}}</template>
                                 </el-table-column>
                               </el-table>
                             </template>
@@ -269,6 +270,7 @@
                                   label="金额"
                                   align="center"
                                   width="120">
+                                  <template slot-scope="scope">{{ __utils.numFormat(scope.row.amount) }}</template>
                                 </el-table-column>
                                 <el-table-column
                                   prop="description"

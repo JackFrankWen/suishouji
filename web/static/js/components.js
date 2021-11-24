@@ -5,7 +5,7 @@
                             <span style="width: 48px"></span>
                             <span class="col"></span>
                             <span class="col">{{ item.label }}</span>
-                            <span class="col">{{ item.amount }}</span>
+                            <span class="col">{{ __utils.numFormat(item.amount) }}</span>
                           </tr>
                         </div>`
   })
