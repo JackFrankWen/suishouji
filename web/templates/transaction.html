@@ -24,7 +24,7 @@
                     <div class="sidebar-heading border-bottom bg-light">随手记</div>
                     <div class="list-group list-group-flush">
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >概览</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=1">入账</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(1)">入账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >查账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >改账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >分析</a>
@@ -515,6 +515,13 @@
               handleCurrentChange(val) {
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
+              },
+              onChangeTabs(val){
+                     if(val === 1){
+                          this.formUpload = __init.formUpload()
+                          this.activeType = 1;
+                          this.activeStep = 0;
+                      }
               },
               dateChange(val){
                   val[0] = val[0] + "T00:00:00"
