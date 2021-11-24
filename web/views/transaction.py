@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from web.api.my_con import run_mysql, query_mysql
+from web.api.my_con import run_mysql, query_mysql,query_one
 from web.api.upload import read_data, to_mysql, read_data_wetchat
 
 import json
@@ -30,17 +30,43 @@ def add_rule():
         'rule': data['data']['rule'],
     }
 
-    insert_rule_table(mysql_data)
+    obj = search_rule_by_category_and_tag(mysql_data)
+
+    if obj:
+        mysql_data['rule'] = '{}|{}'.format( obj.get('rule'), mysql_data.get('rule'))
+        mysql_data['id'] = obj.get('id')
+        update_rule_by_id(mysql_data)
+    else:
+        insert_rule_table(mysql_data)
     return {
         "code": "200",
     }
 
+def update_rule_by_id( data):
+    query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {} WHERE id = {}'.format(
+        data.get('rule'),
+        data.get('category'),
+        data.get('tag'),
+        data.get('id'),
+    )
+    print(query_clause, 'ddd')
+    return run_mysql(query_clause, '')
 
 def insert_rule_table(data):
     add_employee = ("INSERT INTO match_rules "
                     "(category, tag, rule) "
                     "VALUES (%(category)s, %(tag)s, %(rule)s)")
     return run_mysql(add_employee, data)
+
+
+def search_rule_by_category_and_tag(data):
+
+    query = 'SELECT * FROM match_rules WHERE JSON_CONTAINS(category, "{}") AND tag = {}'.format(
+        data.get('category'),
+        data.get('tag')
+    )
+
+    return query_one(query, '')
 
 
 @transaction_blueprint.route("/upload", methods=['GET', 'POST'])
@@ -73,8 +99,8 @@ def load_rule_data(data):
     ruleData = get_all_rule()
     for row in ruleData:
 
-        data.loc[data['description'].str.contains(row['rule']), 'tag'] = row['tag']
-        data.loc[data['description'].str.contains(row['rule']), 'category'] = row['category']
+        data.loc[data['description'].str.contains('{}'.format(row['rule']), regex=True, case=False), 'tag'] = row['tag']
+        data.loc[data['description'].str.contains('{}'.format(row['rule']), regex=True, case=False), 'category'] = row['category']
 
     return data
 

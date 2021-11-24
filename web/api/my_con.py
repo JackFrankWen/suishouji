@@ -51,3 +51,29 @@ def query_mysql(sql,data, pagination=False):
             print("Database does not exist")
         else:
             print(err)
+
+
+def query_one(sql, data):
+    try:
+        conn = mysql.connector.connect(
+            user=mysql_config['user'],
+            passwd=mysql_config['pwd'],
+            db=mysql_config['dbname']
+        )
+        cur = conn.cursor()
+        cur.execute(sql, data)
+        columns = cur.description
+        row = cur.fetchone()
+        result = None
+        if row:
+            result = {description[0]: row[col] for col, description in enumerate(columns)}
+        cur.close()
+        conn.close()
+        return result
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            print(err)
