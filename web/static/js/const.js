@@ -294,6 +294,18 @@ __init = {
                     action: 1,//1 新建 2 修改
                 }
     },
+    formTransactionRule() {
+        return {
+                  create_time: [ { required: true, message: '必填', trigger: 'change' }],
+                  category: [{ required: true, message: '必填', trigger: 'change' }],
+                  consumer: [{ required: true, message: '必填', trigger: 'change' }],
+                  payment_type: [{ required: true, message: '必填', trigger: 'change' }],
+                  amount: [{ required: true, message: '必填', trigger: 'change' }],
+                  account_type: [{ required: true, message: '必填', trigger: 'change' }],
+                  tag: [{ required: true, message: '必填', trigger: 'change' }],
+                  description: [{ required: true, message: '必填', trigger: 'change' }],
+                }
+    },
     batchUpdateForm() {
         return  {// 查账
                     paymentType: undefined,

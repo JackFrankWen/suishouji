@@ -385,18 +385,18 @@
               ref="drawerTransaction"
               >
                 <div class="demo-drawer__content">
-                    <el-form ref="form" :model="formTransaction" label-width="80px">
-                          <el-form-item label="金额">
+                    <el-form ref="formTransaction" :model="formTransaction" :rules="formTransactionRule" label-width="80px">
+                          <el-form-item label="金额" prop="amount" required>
                             <el-input v-model="formTransaction.amount" style="width: 220px"></el-input>
                           </el-form-item>
-                           <el-form-item label="描述">
+                           <el-form-item label="描述" prop="description" required>
                             <el-input
                                     v-model="formTransaction.description"
                                     type="textarea"
                                     style="width: 220px"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="日期" >
+                          <el-form-item label="日期" prop="create_time"  required>
                             <el-date-picker
                               v-model="formTransaction.create_time"
                               type="datetime"
@@ -405,7 +405,7 @@
                               placeholder="选择日期">
                             </el-date-picker>
                           </el-form-item>
-                          <el-form-item label="成员">
+                          <el-form-item label="成员" prop="consumer" required >
                             <el-select
                                 clearable
                                 v-model="formTransaction.consumer"
@@ -414,14 +414,14 @@
                               <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                             </el-select>
                           </el-form-item>
-                         <el-form-item label="分类">
+                         <el-form-item label="分类"  prop="category" required>
                              <el-cascader
                                         clearable
                                         v-model="formTransaction.category"
                                         :options="options"
                                         filterable></el-cascader>
                          </el-form-item>
-                         <el-form-item label="付款方式">
+                         <el-form-item label="付款方式" prop="payment_type" required>
                             <el-select
                                 v-model="formTransaction.payment_type"
                                 placeholder="请选择付款方式"
@@ -430,7 +430,7 @@
                               <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
                             </el-select>
                          </el-form-item>
-                         <el-form-item label="账户">
+                         <el-form-item label="账户" prop="account_type" required>
                             <el-select
                                 v-model="formTransaction.account_type"
                                 clearable
@@ -439,7 +439,7 @@
                               <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                             </el-select>
                          </el-form-item>
-                         <el-form-item label="标签">
+                         <el-form-item label="标签" prop="tag" required>
                             <el-select
                                 v-model="formTransaction.tag"
                                 clearable
@@ -457,6 +457,8 @@
             </el-drawer>
         </div>
         {% endraw %}
+        <!-- import Vue before Element -->
+         <script src="https://unpkg.com/vue/dist/vue.js"></script>
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
@@ -464,8 +466,6 @@
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
         <!-- dayjs -->
         <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
-        <!-- import Vue before Element -->
-         <script src="https://unpkg.com/vue/dist/vue.js"></script>
          <!-- import JavaScript -->
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
         <!-- import axios -->
@@ -498,6 +498,7 @@
 
                 formUpload: __init.formUpload(),// 上传表单
                 formTransaction: __init.formTransaction(),
+                formTransactionRule: __init.formTransactionRule(),
                 formInline: __init.formInline(), // 查账
                 batchQueryForm: __init.batchQueryForm(),
                 batchUpdateForm: __init.batchUpdateForm(),
@@ -556,24 +557,33 @@
                   }
               },
               drawerSubmitTransaction() {
-                   const _this = this;
-                   this.loading = true;
-                   console.log(this.formTransaction)
-                  axios.post('/transcation/createorupdate',{
-                      ...this.formTransaction
-                  },)
-                  .then(function (response) {
-                      _this.formTransaction = __init.formTransaction()
-                      _this.loading = false;
-                      _this.dialogTransaction = false;
-                      _this.onSearchUpdate()
-                       _this.$message({
-                          message: '提交成功',
-                          type: 'success'
-                       })
-                  })
-                  .catch(function (error) {
-                    console.log(error);
+                    const _this = this;
+                    let create_time = this.formTransaction.create_time
+                    if(create_time instanceof Date)
+                      create_time  = dayjs(create_time).format("YYYY-MM-DD HH:mm:ss")
+                    this.$refs['formTransaction'].validate((valid) => {
+                      if (valid) {
+                           this.loading = true;
+                          axios.post('/transcation/createorupdate',{
+                              ...this.formTransaction,
+                              create_time: create_time
+                          },)
+                          .then(function (response) {
+                              _this.formTransaction = __init.formTransaction()
+                              _this.loading = false;
+                              _this.dialogTransaction = false;
+                              _this.onSearchUpdate()
+                               _this.$message({
+                                  message: '提交成功',
+                                  type: 'success'
+                               })
+                          })
+                          .catch(function (error) {
+                            console.log(error);
+                          });
+                      } else {
+                        return false;
+                      }
                   });
               },
               onOpenTranscationDrawer(action) {
@@ -649,7 +659,6 @@
                   })
                   .then(function (response) {
                       const data = response.data
-                      console.log(this)
                       _this.tableData = response.data.data || []
                   })
                   .catch(function (error) {
@@ -667,7 +676,6 @@
                   })
                   .then(function (response) {
                       const data = response.data
-                      console.log(this)
                       _this.tableDataUpdate = response.data.data || []
                        _this.pagination = {
                           total: response.data.total,

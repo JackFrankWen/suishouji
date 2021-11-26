@@ -135,7 +135,6 @@ def get_transaction_by_condition(query_con, pagination):
 
     query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction"
     query_clause += condition
-    print(query_clause)
     return query_mysql(query_clause, '', pagination)
 
 
@@ -143,7 +142,7 @@ def get_transaction_by_condition(query_con, pagination):
 @transaction_blueprint.route("/transaction/query/category", methods=['POST'])
 def query_category():
     data = request.get_json(force=True)
-    list = get_transaction_by_condition(data,False)
+    list = get_transaction_by_condition(data, False)
     return_val = transform_data(list, data['category'],  data['categoryObj'])
     return {'code': 200, 'data': return_val}
 
