@@ -127,12 +127,15 @@ def get_transaction_by_condition(query_con, pagination):
             condition = " WHERE payment_type = {}".format(query_con.get('paymentType'))
         else:
             condition += " AND payment_type = {}".format(query_con.get('paymentType'))
+
+    condition += " ORDER BY create_time DESC"
     if query_con.get('currentPage'):
         offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
         condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
 
     query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction"
     query_clause += condition
+    print(query_clause)
     return query_mysql(query_clause, '', pagination)
 
 
@@ -225,6 +228,7 @@ def transform_data(list, category, categoryObj):
 
     return get_list_amount(obj, categoryObj)
 
+
 def get_list_amount(obj, categoryObj):
     arr = []
     for item in obj:
@@ -259,51 +263,51 @@ def insert_transcation(data):
                     "create_time, "
                     "tag) "
                   "VALUES ("
-                    "%(flow_type)s,"
-                    "%(amount)s, "
-                    "%(category)s, "
-                    "%(description)s, "
-                    "%(account_type)s, "
-                    "%(payment_type)s, "
-                    "%(consumer)s,"
-                    "%(create_time)s, "
-                    "%(tag)s)")
-    query_value = {
-        'amount': data['amount'],
-        'flow_type': 1,
-        'category': json.dumps(data['category']),
-        'description': data['description'],
-        'account_type': data['account_type'],
-        'payment_type': data['payment_type'],
-        'consumer': data['consumer'],
-        'create_time': data['create_time'],
-        'tag': data['tag']
-    }
-    return  run_mysql(query_clause, query_value)
+                    "{},"
+                    "{},"
+                    '"{}", '
+                    "{}, "
+                    "{}, "
+                    "{}, "
+                    "{},"
+                    '"{}", '
+                    "{})").format(
+        1,
+        data.get("amount"),
+        data.get("category"),
+        data.get("description"),
+        data.get("account_type"),
+        data.get("payment_type"),
+        data.get("consumer"),
+        data.get("create_time"),
+        data.get("tag")
+    )
+    print(query_clause)
+    return  run_mysql(query_clause,"")
 
 
 def update_transcation(data):
     # 单个更行
     query_clause = ("UPDATE transaction "
-           "SET description = %(description)s,"
-                    "category = %(category)s,"
-                    "payment_type = %(payment_type)s,"
-                    "consumer = %(consumer)s,"
-                    "create_time = %(create_time)s,"
-                    "tag = %(tag)s,"
-                    "account_type = %(account_type)s "
-           "WHERE id = %(id)s")
-    query_value = {
-        'id': data['id'],
-        'category': json.dumps(data['category']),
-        'description': data['description'],
-        'account_type': data['account_type'],
-        'payment_type': data['payment_type'],
-        'consumer': data['consumer'],
-        'create_time': data['create_time'],
-        'tag': data['tag']
-    }
-    return run_mysql(query_clause, query_value)
+           'SET description = "{}",'
+                    'category = "{}",'
+                    "payment_type = {},"
+                    "consumer = {},"
+                    'create_time = "{}",'
+                    "tag = {},"
+                    "account_type = {} "
+           "WHERE id = {}").format(
+        data['description'],
+        data['category'],
+        data['payment_type'],
+        data['consumer'],
+        data['create_time'],
+        data['tag'],
+        data['account_type'],
+        data['id'],
+    )
+    print(query_clause)
+    return run_mysql(query_clause, "")
 
 
 def batch_update_transcation(data):

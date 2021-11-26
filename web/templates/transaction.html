@@ -400,7 +400,7 @@
                             <el-date-picker
                               v-model="formTransaction.create_time"
                               type="datetime"
-                              value-format="yyyy-MM-dd HH:mm"
+                              value-format="yyyy-MM-dd hh:mm:ss"
                                default-time="12:00:00"
                               placeholder="选择日期">
                             </el-date-picker>
@@ -558,7 +558,10 @@
               drawerSubmitTransaction() {
                    const _this = this;
                    this.loading = true;
-                  axios.post('/transcation/createorupdate',{ ...this.formTransaction},)
+                   console.log(this.formTransaction)
+                  axios.post('/transcation/createorupdate',{
+                      ...this.formTransaction
+                  },)
                   .then(function (response) {
                       _this.formTransaction = __init.formTransaction()
                       _this.loading = false;
@@ -581,8 +584,8 @@
                         if(data) {
                             _this.formTransaction = {
                                 ...data,
-                                create_time: new Date(data.create_time),
                                 category: JSON.parse(data.category),
+                                create_time: new Date(data.create_time),
                             };
                         }
 
