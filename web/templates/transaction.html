@@ -175,38 +175,60 @@
                             <h1 class="mt-2">改账</h1>
                             <bookkeep-alert-rule>
                             </bookkeep-alert-rule>
+
                             <el-form :inline="true" :model="formInline" class="demo-form-inline mt-2">
+                                  <div class="col-12 mb-2">
+                                        <el-radio-group v-model="batchQueryForm.query_null">
+                                          <el-radio-button label="1">正常</el-radio-button>
+                                          <el-radio-button label="2">成员无</el-radio-button>
+                                          <el-radio-button label="3">分类无</el-radio-button>
+                                          <el-radio-button label="4">标签无</el-radio-button>
+                                        </el-radio-group>
+                                  </div>
                                 <el-date-picker
                                   v-model="batchQueryForm.picker"
                                   type="daterange"
                                   value-format="yyyy-MM-dd"
                                   @change="dateChange"
                                   unlink-panels
+                                  style="width: 250px"
                                   start-placeholder="开始月份"
                                   end-placeholder="结束月份"
+
                                   :picker-options="formInline.pickerOptions">
                                 </el-date-picker>
                                 <el-select
                                         clearable
                                         v-model="batchQueryForm.consumer"
                                         placeholder="请选择成员"
+                                        style="width: 120px"
                                 >
                                   <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
                                 <el-select
                                     v-model="batchQueryForm.paymentType"
                                     placeholder="请选择付款方式"
+                                    style="width: 120px"
                                     clearable
                                 >
                                   <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
                                 <el-select
                                     v-model="batchQueryForm.accountType"
+                                    style="width: 120px"
                                     clearable
                                     placeholder="请选择账户"
                                 >
                                   <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                 </el-select>
+                                <el-input
+                                        style="width: 160px"
+                                        suffix-icon="el-icon-date"
+                                        v-model="batchQueryForm.description"
+                                        placeholder="搜索备注关键字">
+                                     <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                </el-input>
+
                               <el-form-item>
                                 <el-button type="primary" @click="onSearchUpdate">查询</el-button>
                                   <el-button type="primary" icon="el-icon-edit"  @click="onOpenTranscationDrawer(1)()">添加</el-button>

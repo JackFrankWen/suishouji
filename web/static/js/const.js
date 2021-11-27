@@ -238,7 +238,7 @@ var __enum = {
                     label: '医疗费用',
                   }, {
                     value: 80003,
-                    label: '其他娱乐',
+                    label: '医疗杂物',
                   }]
                 }, {
                   value: 90000,
@@ -342,6 +342,8 @@ __init = {
                     paymentType: undefined,
                     accountType: undefined,
                     consumer: undefined,
+                    description: undefined,
+                    query_null: 1,
                     pickerOptions: pickerOptions,
                 }
     },
