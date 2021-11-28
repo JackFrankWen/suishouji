@@ -1,7 +1,9 @@
 import pandas as pd
+from sqlalchemy import Numeric
+from sqlalchemy.types import DECIMAL
+
 from sqlalchemy import create_engine
 pd.set_option('display.expand_frame_repr', False)
-
 def to_mysql(dataFrame):
 
     hostname = "localhost"
@@ -16,11 +18,14 @@ def to_mysql(dataFrame):
 
 
     try:
+        print(dataFrame)
         frame = dataFrame.to_sql(tableName,
                                  dbConnection,
+                                 dtype={"amount": DECIMAL},
                                  index=False,
                                  if_exists='append'
-                                 );
+                                 )
+        print(frame)
 
     except ValueError as vx:
 
@@ -145,7 +150,6 @@ def read_data_wetchat(csv):
         'product_id',  # 交易id
         'merchant_id',  # 商铺ID
     ])
-    print(data_frame)
 
     return data_frame
 

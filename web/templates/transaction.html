@@ -143,9 +143,11 @@
                             </el-form>
                             <template>
                               <el-table
-                                      :row-key="getRowKeys"
+                                :row-key="getRowKeys"
                                 :expand-row-keys="expands"
                                 @row-click="clickRowHandle"
+                                :summary-method="getSummaries"
+                                show-summary
                                 :data="tableData"
                                 style="width: 100%"
                               >
@@ -178,7 +180,9 @@
 
                             <el-form :inline="true" :model="formInline" class="demo-form-inline mt-2">
                                   <div class="col-12 mb-2">
-                                        <el-radio-group v-model="batchQueryForm.query_null">
+                                        <el-radio-group
+                                                @change="quickSearch"
+                                                v-model="batchQueryForm.query_null">
                                           <el-radio-button label="1">正常</el-radio-button>
                                           <el-radio-button label="2">成员无</el-radio-button>
                                           <el-radio-button label="3">分类无</el-radio-button>
@@ -223,7 +227,6 @@
                                 </el-select>
                                 <el-input
                                         style="width: 160px"
-                                        suffix-icon="el-icon-date"
                                         v-model="batchQueryForm.description"
                                         placeholder="搜索备注关键字">
                                      <i slot="prefix" class="el-input__icon el-icon-search"></i>
@@ -234,7 +237,7 @@
                                   <el-button type="primary" icon="el-icon-edit"  @click="onOpenTranscationDrawer(1)()">添加</el-button>
                               </el-form-item>
                             </el-form>
-                            <el-form :inline="true" :model="formInline" class="demo-form-inline">
+                            <el-form :inline="true" :model="formInline" class="demo-form-inline bg-light pt-4">
                                </el-form-item>
                                     <el-cascader
                                         placeholder="分类修改为"
@@ -274,6 +277,7 @@
                                 ref="multipleTable"
                                 :data="tableDataUpdate"
                                 tooltip-effect="dark"
+                                @row-click="handleRowClick"
                                 style="width: 100%"
                                 @selection-change="handleSelectionChange">
                                 <el-table-column
@@ -391,8 +395,8 @@
                         </el-select>
                       </el-form-item>
                         <el-form-item class="demo-drawer__footer">
-                            <el-button @click="handleClose">取 消</el-button>
                             <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
+                            <el-button @click="handleClose">取 消</el-button>
                         </el-form-item>
                     </el-form>
                 </div>
@@ -472,7 +476,7 @@
 
                           <el-form-item>
                             <el-button type="primary" @click="drawerSubmitTransaction" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
-                            <el-button @click="handleClose">取消</el-button>
+                            <el-button @click="handleCloseTransaction">取消</el-button>
                           </el-form-item>
                         </el-form>
                 </div>
@@ -507,11 +511,11 @@
                 fileList: [],
                 activeType: 1,
                 pagination: {
-
                     currentPage: 1,
                     pageSize: 20,
                     total: 0,
                 },
+
                 dialog: false, // 抽屉
                 dialogTransaction: false, // 抽屉
                 loading: false,
@@ -542,6 +546,35 @@
               handleCurrentChange(val) {
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
+              },
+              getSummaries(param) {
+                const { columns, data } = param;
+                const sums = [];
+                columns.forEach((column, index) => {
+                  if (index === 1) {
+                    sums[index] = '总支出';
+                    return;
+                  }
+                  const values = data.map(item => Number(item[column.property]));
+                  if (!values.every(value => isNaN(value))) {
+                    sums[index] = values.reduce((prev, curr) => {
+                      const value = Number(curr);
+                      if (!isNaN(value)) {
+                        return prev + curr;
+                      } else {
+                        return prev;
+                      }
+                    }, 0);
+                    sums[index] = '￥'+ sums[index];
+                  } else {
+                    sums[index] = '';
+                  }
+                });
+
+                return sums;
+              },
+              quickSearch(){
+                 this.onSearchUpdate()
               },
               onUploadSuccess(res){
                   this.activeStep = 3;
@@ -733,6 +766,10 @@
               handleSelectionChange(val) {
                   this.multipleSelection = val.map(row=>row.id);
               },
+              handleRowClick(row) {
+                   this.$refs.multipleTable.toggleRowSelection(row);
+              },
+
               submit: function () {
                   // 上穿
                   this.$refs.upload.submit();

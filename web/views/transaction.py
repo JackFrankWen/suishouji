@@ -198,16 +198,7 @@ def query_detail():
 
 def transform_data(list, category, categoryObj):
 
-    obj = {
-        '00000': {
-            'amount': decimal.Decimal(0)
-        },
-        '10000': {
-            'amount': decimal.Decimal(0),
-            'child': {
-            }
-        }
-    }
+    obj = {}
 
     for item in list:
         amount = item['amount']
@@ -233,6 +224,12 @@ def transform_data(list, category, categoryObj):
                 obj[lvl1]['child'][lvl2] += amount
 
         else:
+            if '00000' not in obj.keys():
+                obj['00000'] = {
+                    'amount': decimal.Decimal(0),
+                    'child': {
+                    }
+                }
             obj['00000']['amount'] += amount
 
     return get_list_amount(obj, categoryObj)
