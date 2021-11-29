@@ -125,17 +125,25 @@
                                 </el-date-picker>
                               </el-form-item>
                                 <el-form-item label="消费成员" label-width="80px" >
-                                    <el-select v-model="formInline.consumer" placeholder="请选择成员">
+                                    <el-select
+                                            clearable
+                                            v-model="formInline.consumer"
+                                            placeholder="请选择成员">
                                       <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                                 </el-form-item>
                                 <el-form-item label="支付方式" label-width="80px" >
-                                    <el-select v-model="formInline.paymentType" placeholder="请选择支付方式">
+                                    <el-select
+                                            clearable
+                                            v-model="formInline.paymentType" placeholder="请选择支付方式">
                                       <el-option v-for="op in selectOptionPaymentType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                                 </el-form-item>
                                 <el-form-item label="账户" label-width="80px" >
-                                    <el-select v-model="formInline.accountType" placeholder="请选择账户">
+                                    <el-select
+                                            clearable
+                                            v-model="formInline.accountType"
+                                               placeholder="请选择账户">
                                       <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                                 </el-form-item>

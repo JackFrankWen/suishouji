@@ -1,15 +1,17 @@
 from flask import Blueprint, render_template, request
-from web.api.my_con import run_mysql, query_mysql,query_one
+from web.api.my_con import run_mysql, query_mysql, query_one
 from web.api.upload import read_data, to_mysql, read_data_wetchat
 
 import json
-import  decimal
+import decimal
+
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, decimal.Decimal):
             return str(o)
         return super(DecimalEncoder, self).default(o)
+
 
 transaction_blueprint = Blueprint('transaction', __name__ ,
                                   static_folder='web/static',
@@ -19,6 +21,7 @@ transaction_blueprint = Blueprint('transaction', __name__ ,
 @transaction_blueprint.route("/transaction")
 def transaction():
     return render_template('transaction.html')
+
 
 @transaction_blueprint.route("/add/rule", methods=['POST'])
 def add_rule():
@@ -35,6 +38,7 @@ def add_rule():
         "code": "200",
     }
 
+
 def update_rule_by_id( data):
     query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {} WHERE id = {}'.format(
         data.get('rule'),
@@ -42,6 +46,7 @@ def update_rule_by_id( data):
         data.get('tag'),
         data.get('id'),
     )
+
 
     if (data.get('consumer')):
         query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {},consumer={}  WHERE id = {}'.format(
@@ -62,6 +67,8 @@ def insert_rule_table(data):
         data.get('tag'),
         data.get('rule'),
     )
+
+
     if (data.get('consumer')):
         feild = "(category, tag, rule, consumer) "
         feild_value = 'VALUES ("{}", {}, "{}", {})'.format(
@@ -72,7 +79,6 @@ def insert_rule_table(data):
         )
 
     add_employee += feild + feild_value
-    print(add_employee)
     return run_mysql(add_employee, '')
 
 
@@ -166,7 +172,6 @@ def get_transaction_by_condition(query_con, pagination):
 
     query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
     query_clause += condition
-    print(query_clause)
     return query_mysql(query_clause, '', pagination)
 
 

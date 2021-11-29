@@ -109,13 +109,15 @@ const __enum = {
                   }, {
                     value: 10004,
                     label: '零食（宵夜）',
+                      tag: one_off_consumer,
                   }, {
                     value: 10005,
                     label: '工作餐（早午晚）',
+                      tag: general_consumer,
                   }, {
                     value: 10006,
                     label: '下馆子',
-                       tag: general_consumer,
+                       tag: one_off_consumer,
                       consumer: family,
                   }]
                  }, {
@@ -133,20 +135,21 @@ const __enum = {
                   }, {
                     value: 50003,
                     label: '电子数码',
+                        tag: one_off_consumer,
                   }, {
                     value: 50004,
                     label: '厨房用品',
-                      tag: general_consumer,
+                      tag: fix_consumer,
                       consumer: family,
                   }, {
                     value: 50005,
-                    label: '化妆品',
+                    label: '化妆美容品',
                       tag: one_off_consumer,
                       consumer: wife,
                   }, {
                     value: 50006,
                     label: '宠物支出',
-                      tag: one_off_consumer,
+                      tag: fix_consumer,
                       consumer: family,
                   }, {
                     value: 50007,
@@ -156,7 +159,7 @@ const __enum = {
                   }, {
                     value: 50008,
                     label: '家具家电',
-                      tag: general_consumer,
+                      tag: fix_consumer,
                       consumer: family,
                   }]
                 }, {
@@ -180,20 +183,24 @@ const __enum = {
                   }, {
                     value: 20004,
                     label: '物业费',
-                       tag: general_consumer,
+                       tag: fix_consumer,
                       consumer: family,
                   }, {
                     value: 20005,
                     label: '快递费',
+                      tag: general_consumer,
                   }, {
                     value: 20006,
                     label: '理发费',
+                      tag: fix_consumer,
                   }, {
                     value: 20007,
                     label: '手机话费',
+                        tag: fix_consumer,
                   }, {
                     value: 20008,
                     label: 'VPN年费',
+                      tag: fix_consumer,
                   }]
                 }, {
                   value: 40000,
@@ -251,6 +258,7 @@ const __enum = {
                   }, {
                     value: 30004,
                     label: '火车飞机等',
+                       tag: one_off_consumer,
                   }, {
                     value: 30005,
                     label: '停车费',
@@ -262,12 +270,15 @@ const __enum = {
                   children: [{
                     value: 60001,
                     label: '请客',
+                      tag: one_off_consumer,
                   }, {
                     value: 60002,
                     label: '回礼',
+                      tag: one_off_consumer,
                   }, {
                     value: 60003,
                     label: '孝敬长辈',
+                      tag: one_off_consumer,
                   }]
                 }, {
                   value: 70000,
@@ -275,12 +286,15 @@ const __enum = {
                   children: [{
                     value: 70001,
                     label: '聚会',
+                      tag: one_off_consumer,
                   }, {
                     value: 70002,
                     label: '游戏（桌游）',
+                      tag: one_off_consumer,
                   }, {
                     value: 70003,
                     label: '其他娱乐',
+                      tag: one_off_consumer,
                   }]
                 }, {
                   value: 80000,
@@ -288,12 +302,15 @@ const __enum = {
                   children: [{
                     value: 80001,
                     label: '个人保险',
+                      tag: fix_consumer,
                   }, {
                     value: 80002,
                     label: '医疗费用',
+                      tag: one_off_consumer,
                   }, {
                     value: 80003,
                     label: '医疗杂物',
+                      tag: fix_consumer,
                   }]
                 }, {
                   value: 90000,
@@ -301,12 +318,15 @@ const __enum = {
                   children: [{
                     value: 90001,
                     label: '摄影',
+                      tag: one_off_consumer,
                   }, {
                     value: 90002,
                     label: '书包杂志',
+                      tag: one_off_consumer,
                   }, {
                     value: 90003,
                     label: '个人投资',
+                      tag: one_off_consumer,
                   }]
                 }, {
                   value: '00000',
