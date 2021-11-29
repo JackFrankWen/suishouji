@@ -470,6 +470,7 @@
                                         clearable
                                         v-model="formTransaction.category"
                                         :options="options"
+                                        @change="mappingUpdateRuleMatch"
                                         filterable></el-cascader>
                          </el-form-item>
                          <el-form-item label="付款方式" prop="payment_type" required>
@@ -590,6 +591,14 @@
                       this.$set(this.drawerForm, 'consumer', obj.consumer)
                   if (obj.hasOwnProperty('tag'))
                       this.$set(this.drawerForm, 'tag', obj.tag)
+              },
+              mappingUpdateRuleMatch(val) {
+                  const rules = __enum.getCategoryMappingRule()
+                  const obj = rules[val[1]]
+                  if (obj.hasOwnProperty('consumer'))
+                      this.$set(this.formTransaction, 'consumer', obj.consumer)
+                  if (obj.hasOwnProperty('tag'))
+                      this.$set(this.formTransaction, 'tag', obj.tag)
               },
               getSummaries(param) {
                 const { columns, data } = param;
