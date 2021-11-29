@@ -23,21 +23,14 @@ def transaction():
 @transaction_blueprint.route("/add/rule", methods=['POST'])
 def add_rule():
     data = request.get_json(force=True)
-
-    mysql_data = {
-        'category':  json.dumps(data['data']['category']),
-        'tag': data['data']['tag'],
-        'rule': data['data']['rule'],
-    }
-
-    obj = search_rule_by_category_and_tag(mysql_data)
+    obj = search_rule_by_category_and_tag(data)
 
     if obj:
-        mysql_data['rule'] = '{}|{}'.format( obj.get('rule'), mysql_data.get('rule'))
-        mysql_data['id'] = obj.get('id')
-        update_rule_by_id(mysql_data)
+        data['rule'] = '{}|{}'.format(obj.get('rule'), data.get('rule'))
+        data['id'] = obj.get('id')
+        update_rule_by_id(data)
     else:
-        insert_rule_table(mysql_data)
+        insert_rule_table(data)
     return {
         "code": "200",
     }
@@ -49,13 +42,38 @@ def update_rule_by_id( data):
         data.get('tag'),
         data.get('id'),
     )
+
+    if (data.get('consumer')):
+        query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {},consumer={}  WHERE id = {}'.format(
+            data.get('rule'),
+            data.get('category'),
+            data.get('tag'),
+            data.get('consumer'),
+            data.get('id'),
+    )
     return run_mysql(query_clause, '')
 
+
 def insert_rule_table(data):
-    add_employee = ("INSERT INTO match_rules "
-                    "(category, tag, rule) "
-                    "VALUES (%(category)s, %(tag)s, %(rule)s)")
-    return run_mysql(add_employee, data)
+    add_employee = "INSERT INTO match_rules "
+    feild = "(category, tag, rule) "
+    feild_value = 'VALUES ("{}", {}, "{}")'.format(
+        data.get('category'),
+        data.get('tag'),
+        data.get('rule'),
+    )
+    if (data.get('consumer')):
+        feild = "(category, tag, rule, consumer) "
+        feild_value = 'VALUES ("{}", {}, "{}", {})'.format(
+            data.get('category'),
+            data.get('tag'),
+            data.get('rule'),
+            data.get('consumer'),
+        )
+
+    add_employee += feild + feild_value
+    print(add_employee)
+    return run_mysql(add_employee, '')
 
 
 def search_rule_by_category_and_tag(data):
@@ -81,12 +99,14 @@ def upload_file():
                 data = read_data(file)
                 data['account_type'] = request.form['accountType']
                 data['payment_type'] = request.form['paymentType'] #导入长
+                data['consumer'] = request.form['consumer']  # 导入长
                 data = load_rule_data(data)
                 to_mysql(data)
             else:
                 data = read_data_wetchat(file)
                 data['account_type'] = request.form['accountType']
                 data['payment_type'] = request.form['paymentType']  # 导入长
+                data['consumer'] = request.form['consumer']  # 导入长
                 data = load_rule_data(data)
                 to_mysql(data)
             return 'file uploaded successfully'
@@ -97,6 +117,8 @@ def load_rule_data(data):
 
     ruleData = get_all_rule()
     for row in ruleData:
+        if(row.get("consumer")):
+            data.loc[data['description'].str.contains('{}'.format(row['rule']), regex=True, case=False), 'consumer'] = row['consumer']
 
         data.loc[data['description'].str.contains('{}'.format(row['rule']), regex=True, case=False), 'tag'] = row['tag']
         data.loc[data['description'].str.contains('{}'.format(row['rule']), regex=True, case=False), 'category'] = row['category']

@@ -18,15 +18,12 @@ def to_mysql(dataFrame):
 
 
     try:
-        print(dataFrame)
-        frame = dataFrame.to_sql(tableName,
-                                 dbConnection,
-                                 dtype={"amount": DECIMAL},
-                                 index=False,
-                                 if_exists='append'
-                                 )
-        print(frame)
-
+        dataFrame.to_sql(tableName,
+                         dbConnection,
+                         dtype={"amount": DECIMAL},
+                         index=False,
+                         if_exists='append'
+                         )
     except ValueError as vx:
 
         print(vx)

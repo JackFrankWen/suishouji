@@ -74,8 +74,10 @@
                                       <el-radio label="2" border>微信csv导入</el-radio>
                                     </el-radio-group>
                                   </el-form-item>
-                                  <el-form-item v-show="activeStep===0" label="消费账户">
-                                    <el-radio-group v-model="formUpload.accountType">
+                                  <el-form-item v-show="activeStep===0" label="钱包">
+                                    <el-radio-group
+                                            @change="setConsumer"
+                                            v-model="formUpload.accountType">
                                       <el-radio label="1" >老公钱包</el-radio>
                                       <el-radio label="2" >老婆钱包</el-radio>
                                     </el-radio-group>
@@ -242,6 +244,7 @@
                                     <el-cascader
                                         placeholder="分类修改为"
                                         clearable
+                                        @change="mappingRule"
                                         v-model="batchUpdateForm.category"
                                         :options="options"
                                         filterable></el-cascader>
@@ -387,13 +390,27 @@
                         <el-input v-model="drawerForm.rule" placeholder="描述中包含字符时命中规则"></el-input>
                       </el-form-item>
                          <el-form-item label="分类" label-width="80px">
-                            <el-cascader-panel :options="options" clearable v-model="drawerForm.category"></el-cascader-panel>
+                            <el-cascader-panel
+                                    :options="options"
+                                    @change="mappingRuleMatch"
+                                    clearable
+                                    v-model="drawerForm.category"></el-cascader-panel>
                          </el-form-item>
+                        <el-form-item label="成员">
+                            <el-select
+                                clearable
+                                v-model="drawerForm.consumer"
+                                placeholder="请选择成员"
+                            >
+                              <el-option v-for="op in selectOptionConsumer" :label="op.label" :value="op.value"></el-option>
+                            </el-select>
+                          </el-form-item>
                       <el-form-item label="标签" label-width="80px" >
                         <el-select v-model="drawerForm.tag" placeholder="请选择标签">
                             <el-option v-for="op in selectOption" :label="op.label" :value="op.value"></el-option>
                         </el-select>
                       </el-form-item>
+
                         <el-form-item class="demo-drawer__footer">
                             <el-button type="primary" @click="drawerSubmit" :loading="loading">{{ loading ? '提交中 ...' : '确 定' }}</el-button>
                             <el-button @click="handleClose">取 消</el-button>
@@ -547,6 +564,25 @@
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
               },
+              mappingRule(val) {
+                  const rules = __enum.getCategoryMappingRule()
+                  const obj = rules[val[1]]
+                  if (obj.hasOwnProperty('consumer'))
+                      this.$set(this.batchUpdateForm, 'consumer', obj.consumer)
+                  if (obj.hasOwnProperty('tag'))
+                      this.$set(this.batchUpdateForm, 'tag', obj.tag)
+              },
+              setConsumer(val){
+                  this.$set(this.formUpload, 'consumer', val)
+              },
+              mappingRuleMatch(val) {
+                  const rules = __enum.getCategoryMappingRule()
+                  const obj = rules[val[1]]
+                  if (obj.hasOwnProperty('consumer'))
+                      this.$set(this.drawerForm, 'consumer', obj.consumer)
+                  if (obj.hasOwnProperty('tag'))
+                      this.$set(this.drawerForm, 'tag', obj.tag)
+              },
               getSummaries(param) {
                 const { columns, data } = param;
                 const sums = [];
@@ -578,7 +614,6 @@
               },
               onUploadSuccess(res){
                   this.activeStep = 3;
-                  console.log(res)
                   this.$message({
                                       message: '上传成功',
                                       type: 'success'
@@ -692,7 +727,7 @@
               },
               drawerSubmit () {
                   const _this = this;
-                  axios.post('/add/rule',{data: this.drawerForm},)
+                  axios.post('/add/rule',{...this.drawerForm},)
                   .then(function (response) {
                       _this.drawerForm = __init.drawerForm();
                       _this.$message({
