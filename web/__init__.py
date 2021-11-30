@@ -1,6 +1,7 @@
 from flask import Flask
 from web.views.home import home_blueprint
 from web.views.transaction import transaction_blueprint
+from web.views.report import report_blueprint
 import os
 
 
@@ -12,4 +13,5 @@ def create_app():
 
     app.register_blueprint(home_blueprint)
     app.register_blueprint(transaction_blueprint)
+    app.register_blueprint(report_blueprint)
     return app

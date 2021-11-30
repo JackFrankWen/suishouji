@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>随手记</title>
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{{ url_for('static', filename='css/transaction.css') }}" rel="stylesheet" />
+        <!-- import CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+
+    </head>
+    <body>
+        {% raw %}
+        <div id="app">
+
+            <div class="d-flex" id="wrapper">
+                <!-- Sidebar-->
+                <div class="border-end bg-white" id="sidebar-wrapper">
+                    <div class="sidebar-heading border-bottom bg-light">随手记</div>
+                    <div class="list-group list-group-flush">
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >成员表</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=1">趋势图</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >查账</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >改账</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >分析</a>
+                    </div>
+                </div>
+                <!-- Page content wrapper-->
+                <div id="page-content-wrapper">
+                    <!-- Top navigation-->
+                    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                        <div class="container-fluid">
+                            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+
+                                <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                                    <li class="nav-item active"><a class="nav-link" href="/">主页</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/transaction">记账</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/report">报表</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </nav>
+
+
+
+                    <!-- Page content-->
+                    <div class="container-fluid">
+                        <!--    概览  -->
+                        <div v-show="activeType===0">
+                            <h1 class="mt-4">1111</h1>
+                        </div>
+                         <!--    入账  -->
+                        <div v-show="activeType===1">
+
+                        </div>
+                         <!--    查账  -->
+                        <div v-show="activeType===2">
+
+                        </div>
+                         <!--    改账  -->
+                        <div v-show="activeType===3" class="p-2">
+                            <h1 class="mt-2">改账</h1>
+
+                        </div>
+                         <!--    分析  -->
+                        <div v-show="activeType===4">
+                            <h1 class="mt-4">4</h1>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        {% endraw %}
+        <!-- import Vue before Element -->
+         <script src="https://unpkg.com/vue/dist/vue.js"></script>
+        <!-- import enum.js -->
+        <script src="{{ url_for('static', filename='js/const.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- dayjs -->
+        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
+         <!-- import JavaScript -->
+        <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <!-- import axios -->
+        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+          <!-- import componet.js -->
+        <script src="{{ url_for('static', filename='js/components.js') }}"></script>
+      <script>
+
+          // vue
+         new Vue({
+          el: '#app',
+          data: function() {
+            return {
+                visible: false,
+                getRowKeys: function(row) {return row.id},
+                expands: [],
+                fileList: [],
+                activeType: 1,
+                pagination: {
+                    currentPage: 1,
+                    pageSize: 20,
+                    total: 0,
+                },
+
+                dialog: false, // 抽屉
+                dialogTransaction: false, // 抽屉
+                loading: false,
+                activeStep: 0, // 步骤条
+
+
+                formUpload: __init.formUpload(),// 上传表单
+                formTransaction: __init.formTransaction(),
+                formTransactionRule: __init.formTransactionRule(),
+                formInline: __init.formInline(), // 查账
+                batchQueryForm: __init.batchQueryForm(),
+                batchUpdateForm: __init.batchUpdateForm(),
+                drawerForm:__init.drawerForm(),
+
+                options: __enum.categoryType,
+                selectOption: __enum.getTag(),
+                selectOptionConsumer: __enum.getConsumer(),
+                selectOptionAccountType: __enum.getAccountType(),
+                selectOptionPaymentType: __enum.getPaymentType(),
+
+
+                tableData: [],
+                tableDataUpdate: [],
+                multipleSelection: []
+            }
+          },
+
+        })
+      </script>
+    </body>
+</html>

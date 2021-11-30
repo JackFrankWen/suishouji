@@ -23,7 +23,6 @@
                 <div class="border-end bg-white" id="sidebar-wrapper">
                     <div class="sidebar-heading border-bottom bg-light">随手记</div>
                     <div class="list-group list-group-flush">
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >概览</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(1)">入账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >查账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >改账</a>
@@ -38,8 +37,9 @@
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
                                 <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
-                                    <li class="nav-item active"><a class="nav-link" href="/">Home</a></li>
-                                    <li class="nav-item"><a class="nav-link" href="#!">Link</a></li>
+                                    <li class="nav-item active"><a class="nav-link" href="/">主页</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/transaction">记账</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/report">报表</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -49,10 +49,6 @@
 
                     <!-- Page content-->
                     <div class="container-fluid">
-                        <!--    概览  -->
-                        <div v-show="activeType===0">
-                            <h1 class="mt-4">1111</h1>
-                        </div>
                          <!--    入账  -->
                         <div v-show="activeType===1">
 <!--                            <el-row class="mt-4">-->
@@ -63,18 +59,21 @@
 
                                 <!--    form  -->
                                 <el-form ref="formUpload" :model="formUpload" label-width="80px">
-                                    <el-steps :active="activeStep" finish-status="success">
+                                    <el-steps :active="activeStep" finish-status="success" class="mt-4">
                                       <el-step title="第一步选择上传分类" description="选择上传方式"></el-step>
                                       <el-step title="第二步导入数据" description="选择上传文件"></el-step>
                                       <el-step title="第三步数据导入完成" description="查看导入数据"></el-step>
                                     </el-steps>
-                                  <el-form-item v-show="activeStep===0"  label="导入方式">
+                                  <el-form-item
+                                          class="mt-2"
+                                          v-show="activeStep===0"  label="导入方式">
                                     <el-radio-group  v-model="formUpload.paymentType">
                                       <el-radio label="1" border>支付宝csv导入</el-radio>
                                       <el-radio label="2" border>微信csv导入</el-radio>
                                     </el-radio-group>
                                   </el-form-item>
-                                  <el-form-item v-show="activeStep===0" label="钱包">
+                                  <el-form-item
+                                          v-show="activeStep===0" label="钱包">
                                     <el-radio-group
                                             @change="setConsumer"
                                             v-model="formUpload.accountType">
@@ -618,7 +617,7 @@
                         return prev;
                       }
                     }, 0);
-                    sums[index] = '￥'+ sums[index];
+                    sums[index] = __utils.numFormat(sums[index]);
                   } else {
                     sums[index] = '';
                   }
