@@ -101,20 +101,15 @@ def upload_file():
         # empty file without a filename.
         if file:
             if int(request.form['paymentType']) == 1:
-
                 data = read_data(file)
-                data['account_type'] = request.form['accountType']
-                data['payment_type'] = request.form['paymentType'] #导入长
-                data['consumer'] = request.form['consumer']  # 导入长
-                data = load_rule_data(data)
-                to_mysql(data)
             else:
                 data = read_data_wetchat(file)
-                data['account_type'] = request.form['accountType']
-                data['payment_type'] = request.form['paymentType']  # 导入长
-                data['consumer'] = request.form['consumer']  # 导入长
-                data = load_rule_data(data)
-                to_mysql(data)
+
+            data['account_type'] = request.form['accountType']
+            data['payment_type'] = request.form['paymentType']  # 导入长
+            data['consumer'] = request.form['consumer']  # 导入长
+            data = load_rule_data(data)
+            to_mysql(data)
             return 'file uploaded successfully'
     return {'code': 200}
 
@@ -153,6 +148,9 @@ def get_transaction_by_condition(query_con, pagination):
     if query_con.get('description'):
         condition += ' AND description LIKE "%{}%"'.format(query_con.get('description'))
 
+    if query_con.get('category'):
+        condition += ' AND json_contains(`category`, "{}") '.format(query_con.get('category'))
+
     if query_con.get('query_null') == "2":
         condition += ' AND consumer IS NULL'
 
@@ -172,6 +170,7 @@ def get_transaction_by_condition(query_con, pagination):
 
     query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
     query_clause += condition
+    print(query_clause)
     return query_mysql(query_clause, '', pagination)
 
 
@@ -180,7 +179,7 @@ def get_transaction_by_condition(query_con, pagination):
 def query_category():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data, False)
-    return_val = transform_data(list, data['category'],  data['categoryObj'])
+    return_val = transform_data(list, data['categoryObj'])
     return {'code': 200, 'data': return_val}
 
 
@@ -223,7 +222,7 @@ def query_detail():
     }
 
 
-def transform_data(list, category, categoryObj):
+def transform_data(list, categoryObj):
 
     obj = {}
 

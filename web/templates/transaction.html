@@ -210,6 +210,12 @@
 
                                   :picker-options="formInline.pickerOptions">
                                 </el-date-picker>
+                                <el-cascader
+                                        placeholder="请选择分类"
+                                        clearable
+                                        v-model="batchQueryForm.category"
+                                        :options="options"
+                                        filterable></el-cascader>
                                 <el-select
                                         clearable
                                         v-model="batchQueryForm.consumer"
@@ -759,7 +765,6 @@
                   // 查账
                   const _this = this
                   axios.post('/transaction/query/category',{
-                      category: __enum.categoryType,
                       categoryObj: __enum.getCategoryObj(),
                       ...this.formInline
                   })
@@ -775,8 +780,8 @@
                   // 改账页面查询
                   const _this = this
                   axios.post('/transaction/query/detail',{
-                      category: __enum.categoryType,
-                      categoryObj: __enum.getCategoryObj(),
+                      // category: __enum.categoryType,
+                      // categoryObj: __enum.getCategoryObj(),
                       ...this.pagination,
                       ...this.batchQueryForm
                   })

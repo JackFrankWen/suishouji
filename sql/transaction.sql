@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `transaction`(
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    amount DECIMAL  NOT NULL COMMENT '金额',
+    amount DECIMAL(15,2)  NOT NULL COMMENT '金额',
     category JSON DEFAULT NULL COMMENT '分类',
     description VARCHAR(200) COMMENT '描述',
     account_type INT COMMENT '消费账户 1.老公钱包 2.老婆钱包 ',

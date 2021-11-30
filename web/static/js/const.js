@@ -319,6 +319,7 @@ const __enum = {
                     value: 90001,
                     label: '摄影',
                       tag: one_off_consumer,
+                      consumer: wife
                   }, {
                     value: 90002,
                     label: '书包杂志',
