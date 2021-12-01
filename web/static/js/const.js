@@ -414,8 +414,8 @@ __init = {
                     pickerOptions: pickerOptions,
                 }
     },
-    batchQueryForm() {
-        return {// 查账
+    batchQueryForm(obj) {
+        const init = {// 查账
                     picker: undefined,
                     paymentType: undefined,
                     accountType: undefined,
@@ -424,6 +424,8 @@ __init = {
                     query_null: 1,
                     pickerOptions: pickerOptions,
                 }
+        if(obj) return Object.assign({},init,obj)
+        return init
     },
 
 }

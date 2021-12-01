@@ -1,7 +1,7 @@
   Vue.component('table-expend-list', {
-              props: ['data'],
+              props: ['data', 'redirectClick'],
               template: `<div style="margin: -12px">
-                        <tr v-for="item in data" class="row align-items-center bg-light border-bottom" >
+                        <tr v-for="item in data" class="row align-items-center bg-light border-bottom" @click="$emit('redirect-to-tab', item)">
                             <span style="width: 48px" class="bg-light p-2"></span>
                             <span class="col bg-light p-2"></span>
                             <span class="col p-2 bg-secondary text-white">{{ item.label }}</span>

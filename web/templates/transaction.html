@@ -100,7 +100,7 @@
                                   </el-form-item>
                                   <el-form-item>
                                       <el-button type="primary" v-if="activeStep==0"   @click="next">下一步</el-button>
-                                       <el-button type="primary" v-if="activeStep==1" @click="submit">上传数据</el-button>
+                                       <el-button type="primary" v-if="activeStep==1" @click="uploadSubmit">上传数据</el-button>
                                       <el-button v-if="activeStep==1"   @click="prev">上一步</el-button>
                                       <el-button v-if="activeStep==0"  @click="dialog = true">添加规则</el-button>
                                   </el-form-item>
@@ -162,7 +162,7 @@
                               >
                                 <el-table-column type="expand">
                                   <template slot-scope="props">
-                                        <table-expend-list :data="props.row.child"></table-expend-list>
+                                        <table-expend-list :data="props.row.child" @redirect-to-tab="redirectClick"></table-expend-list>
                                   </template>
                                 </el-table-column>
                                 <el-table-column
@@ -248,7 +248,7 @@
                                 </el-input>
 
                               <el-form-item>
-                                <el-button type="primary" @click="onSearchUpdate">查询</el-button>
+                                <el-button ref="btnSearchUpdate" type="primary" @click="onSearchUpdate">查询</el-button>
                                   <el-button type="primary" icon="el-icon-edit"  @click="onOpenTranscationDrawer(1)()">添加</el-button>
                               </el-form-item>
                             </el-form>
@@ -578,6 +578,15 @@
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
               },
+              redirectClick(obj){
+                  this.activeType = 3
+                  // this.$set(this.batchQueryForm, 'category', obj.category)
+                  this.batchQueryForm = Object.assign({}, __init.batchQueryForm({
+                      category: obj.category,
+                      ...this.formInline
+                  }))
+                  this.$refs['btnSearchUpdate'].handleClick()
+              },
               mappingRule(val) {
                   const rules = __enum.getCategoryMappingRule()
                   const obj = rules[val[1]]
@@ -826,7 +835,7 @@
                    this.$refs.multipleTable.toggleRowSelection(row);
               },
 
-              submit: function () {
+              uploadSubmit: function () {
                   // 上穿
                   this.$refs.upload.submit();
               }

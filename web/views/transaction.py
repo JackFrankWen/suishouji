@@ -275,6 +275,7 @@ def get_list_amount(obj, categoryObj):
                 child_arr.append({
                     'id': child_item,
                     'label':  categoryObj[str(child_item)],
+                    'category':  [int(item), int(child_item)],
                     'amount': str(child_obj[child_item])
                 })
             new_obj['child'] = child_arr
