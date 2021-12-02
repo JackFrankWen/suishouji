@@ -2,13 +2,15 @@ import mysql.connector
 from mysql.connector import errorcode
 
 from web.config import mysql_config
+from web.config import get_config
 
 def run_mysql(sql,data):
+    config = get_config()
     try:
         conn = mysql.connector.connect(
-            user=mysql_config['user'],
-            passwd=mysql_config['pwd'],
-            db=mysql_config['dbname']
+            user=config.DB_USER,
+            passwd=config.DB_PASSWORD,
+            db=config.DB_NAME
         )
         cur = conn.cursor()
         cur.execute(sql, data)
@@ -26,11 +28,12 @@ def run_mysql(sql,data):
 
 
 def query_mysql(sql,data, pagination=False):
+    config = get_config()
     try:
         conn = mysql.connector.connect(
-            user=mysql_config['user'],
-            passwd=mysql_config['pwd'],
-            db=mysql_config['dbname']
+            user=config.DB_USER,
+            passwd=config.DB_PASSWORD,
+            db=config.DB_NAME
         )
         cur = conn.cursor()
         cur.execute(sql, data)
@@ -53,11 +56,12 @@ def query_mysql(sql,data, pagination=False):
 
 
 def query_one(sql, data):
+    config = get_config()
     try:
         conn = mysql.connector.connect(
-            user=mysql_config['user'],
-            passwd=mysql_config['pwd'],
-            db=mysql_config['dbname']
+            user=config.DB_USER,
+            passwd=config.DB_PASSWORD,
+            db=config.DB_NAME
         )
         cur = conn.cursor()
         cur.execute(sql, data)

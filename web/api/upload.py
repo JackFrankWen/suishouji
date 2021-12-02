@@ -1,19 +1,16 @@
 import pandas as pd
-from sqlalchemy import Numeric
 from sqlalchemy.types import DECIMAL
 
 from sqlalchemy import create_engine
+from web.config import get_config
 pd.set_option('display.expand_frame_repr', False)
+
+
 def to_mysql(dataFrame):
 
-    hostname = "localhost"
-    dbname = "bookkeep"
-    uname = "root"
-    pwd = "root"
     tableName = "transaction"
-
-    engine = create_engine("mysql+pymysql://{user}:{pw}@{host}/{db}"
-                           .format(host=hostname, db=dbname, user=uname, pw=pwd))
+    config = get_config()
+    engine = create_engine(config.SQLALCHEMY_DATABASE_URI)
     dbConnection = engine.connect()
 
 

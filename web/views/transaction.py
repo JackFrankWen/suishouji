@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one
 from web.api.upload import read_data, to_mysql, read_data_wetchat
-
+from web.config import get_config
 import json
 import decimal
 
@@ -20,7 +20,8 @@ transaction_blueprint = Blueprint('transaction', __name__ ,
 
 @transaction_blueprint.route("/transaction")
 def transaction():
-    return render_template('transaction.html')
+    config = get_config()
+    return render_template('transaction.html', title=config.TITLE, classes=config.CLASSES)
 
 
 @transaction_blueprint.route("/add/rule", methods=['POST'])
@@ -315,8 +316,7 @@ def insert_transcation(data):
         data.get("create_time"),
         data.get("tag")
     )
-    print(query_clause)
-    return  run_mysql(query_clause,"")
+    return run_mysql(query_clause, "")
 
 
 def update_transcation(data):
@@ -339,7 +339,6 @@ def update_transcation(data):
         data['account_type'],
         data['id'],
     )
-    print(query_clause)
     return run_mysql(query_clause, "")
 
 
