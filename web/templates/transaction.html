@@ -99,7 +99,7 @@
                                     </el-checkbox-group>
                                   </el-form-item>
                                   <el-form-item>
-                                      <el-button type="primary" v-if="activeStep==0"   @click="next">下一步</el-button>
+                                      <el-button type="primary" v-if="activeStep==0" :disabled="nextDisabled"  @click="next">下一步</el-button>
                                        <el-button type="primary" v-if="activeStep==1" @click="uploadSubmit">上传数据</el-button>
                                       <el-button v-if="activeStep==1"   @click="prev">上一步</el-button>
                                       <el-button v-if="activeStep==0"  @click="dialog = true">添加规则</el-button>
@@ -533,6 +533,15 @@
           // vue
          new Vue({
           el: '#app',
+          computed:{
+              nextDisabled(){
+                  if (this.formUpload.paymentType && this.formUpload.accountType){
+                      return false
+                  }
+                  return true;
+              },
+
+          },
           data: function() {
             return {
                 visible: false,
