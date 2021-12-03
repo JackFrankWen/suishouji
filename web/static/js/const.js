@@ -414,6 +414,13 @@ __init = {
                     pickerOptions: pickerOptions,
                 }
     },
+    paginationInit() {
+        return    {
+                    currentPage: 1,
+                    pageSize: 20,
+                    total: 0,
+                }
+    },
     batchQueryForm(obj) {
         const init = {// 查账
                     picker: undefined,

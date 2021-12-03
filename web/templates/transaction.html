@@ -94,7 +94,7 @@
                                       >
                                         <i class="el-icon-upload"></i>
                                         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                                        <div class="el-upload__tip" slot="tip">请上传<span class="fw-bolder link-danger">{{ formUpload.paymentType == 1 ? '支付宝': '微信'}}</span>下载的csv文件</div>
+                                        <div class="el-upload__tip" slot="tip">请上传<span class="fw-bolder link-danger">{{ formUpload.paymentType == 1 ? '支付宝': '微信'}}</span>下载的csv文件，数据将存入<span class="fw-bolder link-danger">{{ formUpload.accountType == 1 ? '老公钱包': '老婆钱包'}}</span></div>
                                     </el-upload>
                                     </el-checkbox-group>
                                   </el-form-item>
@@ -374,7 +374,6 @@
                                   @current-change="handleCurrentChange"
                                   :current-page="pagination.currentPage"
                                   :page-size=" pagination.pageSize"
-                                  :hide-on-single-page="true"
                                   :total="pagination.total">
                                 </el-pagination>
                             </div>
@@ -541,11 +540,7 @@
                 expands: [],
                 fileList: [],
                 activeType: 1,
-                pagination: {
-                    currentPage: 1,
-                    pageSize: 20,
-                    total: 0,
-                },
+                pagination: __init.paginationInit(),
 
                 dialog: false, // 抽屉
                 dialogTransaction: false, // 抽屉
@@ -585,6 +580,7 @@
                       category: obj.category,
                       ...this.formInline
                   }))
+                  this.pagination = Object.assign({}, __init.paginationInit())
                   this.$refs['btnSearchUpdate'].handleClick()
               },
               mappingRule(val) {
@@ -640,7 +636,9 @@
 
                 return sums;
               },
-              quickSearch(){
+              quickSearch(val){
+                  this.batchQueryForm = Object.assign({}, __init.batchQueryForm({query_null: val}))
+                  this.pagination = Object.assign({}, __init.paginationInit())
                  this.onSearchUpdate()
               },
               onUploadSuccess(res){

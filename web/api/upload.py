@@ -81,7 +81,7 @@ def read_data(csv):
     data_frame.loc[(data_frame['type'].str.contains("收入")), "flow_type"] = '2'
     # data_frame.loc[(data_frame['type'].str.contains("其他")), "flow_type"] = '3'
     # data_frame = data_frame.drop(data_frame[data_frame.flow_type == "3"].index)
-
+    # 过滤交易关闭
     data_frame = data_frame.drop(data_frame[data_frame['status'].str.contains("交易关闭")].index)
     data_frame = data_frame[data_frame["status"].str.contains("交易关闭") == False]
 
