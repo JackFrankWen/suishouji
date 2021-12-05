@@ -11,7 +11,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{{ url_for('static', filename='css/transaction.css') }}" rel="stylesheet" />
         <!-- import CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+        <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 
     </head>
     <body>
@@ -23,9 +23,9 @@
                 <div class="border-end bg-white" id="sidebar-wrapper">
                     <div class="sidebar-heading border-bottom bg-light">快速记</div>
                     <div class="list-group list-group-flush">
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >成员表</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=1">趋势图</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >查账</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >概览</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=1">月账单</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >趋势图</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >改账</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >分析</a>
                     </div>
@@ -52,14 +52,19 @@
                     <div class="container-fluid">
                         <!--    概览  -->
                         <div v-show="activeType===0">
-                            <h1 class="mt-4">1111</h1>
+                            <h1 class="mt-4">消费饼图</h1>
+                            <div id="pie-chart" style="width: 600px;height:400px;"></div>
                         </div>
                          <!--    入账  -->
                         <div v-show="activeType===1">
+                            <h1 class="mt-4">月消费汇总</h1>
+                            <div id="bar-chart" style="width: 800px;height:400px;"></div>
 
                         </div>
                          <!--    查账  -->
                         <div v-show="activeType===2">
+                            <h1 class="mt-4">消费趋势</h1>
+                            <div id="line-chart" style="width: 800px;height:400px;"></div>
 
                         </div>
                          <!--    改账  -->
@@ -83,62 +88,39 @@
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/echart.js') }}"></script>
         <!-- Bootstrap core JS-->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
         <!-- dayjs -->
         <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.js"></script>
          <!-- import JavaScript -->
         <script src="https://unpkg.com/element-ui/lib/index.js"></script>
         <!-- import axios -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-          <!-- import componet.js -->
-        <script src="{{ url_for('static', filename='js/components.js') }}"></script>
-      <script>
+        <script type="text/javascript">
+        </script>
+        <script>
+              // vue
+             new Vue({
+              el: '#app',
+              data: function() {
+                return {
+                    activeType: 0,
 
-          // vue
-         new Vue({
-          el: '#app',
-          data: function() {
-            return {
-                visible: false,
-                getRowKeys: function(row) {return row.id},
-                expands: [],
-                fileList: [],
-                activeType: 1,
-                pagination: {
-                    currentPage: 1,
-                    pageSize: 20,
-                    total: 0,
-                },
+                }
+              },
+              mounted() {
+                  this.$nextTick(function () {
+                    // 仅在整个视图都被渲染之后才会运行的代码
+                       // 基于准备好的dom，初始化echarts实例
+                          pieInit()
+                          barInit()
+                          lineInit()
+                  })
+                }
 
-                dialog: false, // 抽屉
-                dialogTransaction: false, // 抽屉
-                loading: false,
-                activeStep: 0, // 步骤条
-
-
-                formUpload: __init.formUpload(),// 上传表单
-                formTransaction: __init.formTransaction(),
-                formTransactionRule: __init.formTransactionRule(),
-                formInline: __init.formInline(), // 查账
-                batchQueryForm: __init.batchQueryForm(),
-                batchUpdateForm: __init.batchUpdateForm(),
-                drawerForm:__init.drawerForm(),
-
-                options: __enum.categoryType,
-                selectOption: __enum.getTag(),
-                selectOptionConsumer: __enum.getConsumer(),
-                selectOptionAccountType: __enum.getAccountType(),
-                selectOptionPaymentType: __enum.getPaymentType(),
-
-
-                tableData: [],
-                tableDataUpdate: [],
-                multipleSelection: []
-            }
-          },
-
-        })
-      </script>
+            })
+        </script>
     </body>
 </html>
