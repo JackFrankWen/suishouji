@@ -52,7 +52,27 @@
                     <div class="container-fluid">
                         <!--    概览  -->
                         <div v-show="activeType===0">
-                            <h1 class="mt-4">消费饼图</h1>
+                            <h2 class="mt-4">月消费</h2>
+                            <el-form :inline="true" :model="formPie" class="demo-form-inline">
+                              <el-form-item>
+                                   <el-date-picker
+                                      v-model="formPie.date"
+                                      type="month"
+                                      placeholder="选择月">
+                                    </el-date-picker>
+                              </el-form-item>
+                                 <el-form-item>
+                                    <el-select
+                                            clearable
+                                            v-model="formPie.accountType"
+                                               placeholder="请选择账户">
+                                      <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
+                                    </el-select>
+                                </el-form-item>
+                              <el-form-item>
+                                <el-button type="primary" @click="onSearch">查询</el-button>
+                              </el-form-item>
+                            </el-form>
                             <div id="pie-chart" style="width: 600px;height:400px;"></div>
                         </div>
                          <!--    入账  -->
@@ -105,8 +125,15 @@
               data: function() {
                 return {
                     activeType: 0,
+                    formPie:{
+                        date: undefined
+                    },
+                    selectOptionAccountType: __enum.getAccountType(),
 
                 }
+              },
+              methods: {
+                  onSearch(){},
               },
               mounted() {
                   this.$nextTick(function () {

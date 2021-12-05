@@ -21,7 +21,6 @@
                 <!-- Sidebar-->
                 <div class="border-end bg-white" id="sidebar-wrapper">
                     <div class="sidebar-heading border-bottom {{ classes}}">{{title}}</div>
-                      {% raw %}
                     <div class="list-group list-group-flush">
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(1)">导入账单</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >账单汇总</a>
@@ -32,7 +31,7 @@
                 <!-- Page content wrapper-->
                 <div id="page-content-wrapper">
                     <!-- Top navigation-->
-                    <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                    <nav class="navbar navbar-expand-lg navbar-light border-bottom {{ classes}}">
                         <div class="container-fluid">
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
 
@@ -46,7 +45,7 @@
                     </nav>
 
 
-
+                       {% raw %}
                     <!-- Page content-->
                     <div class="container-fluid">
                          <!--    导入账单  -->
@@ -289,6 +288,11 @@
                                     </el-select>
                               <el-form-item>
                                 <el-button type="primary" @click="onBatchUpdate" >确认修改</el-button>
+                                  <el-popconfirm
+                                          title="确认删除？"
+                                          @confirm="onBatchDelete()">
+                                            <el-button  slot="reference">批量删除</el-button>
+                                         </el-popconfirm>
                               </el-form-item>
                             </el-form>
                             <el-table
@@ -303,6 +307,7 @@
                                   width="55">
                                 </el-table-column>
                                 <el-table-column
+                                        fixed
                                   prop="name"
                                   label="分类"
                                   align="center"
@@ -320,7 +325,14 @@
                                   prop="description"
                                   label="描述"
                                   align="center"
+                                  width="220"
                                   show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column
+                                  label="交易日期"
+                                  align="center"
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.trans_time) }}</template>
                                 </el-table-column>
                                 <el-table-column
                                   prop="consumer"
@@ -351,13 +363,20 @@
                                     <template slot-scope="scope">{{ __enum.getTagKey(scope.row.tag) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  label="日期"
+                                  label="创建时间"
                                   align="center"
                                   width="140">
-                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.create_time) }}</template>
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.creation_time) }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  label="修改日时间"
+                                  align="center"
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.modification_time) }}</template>
                                 </el-table-column>
                                 <el-table-column
                                   label="操作"
+                                  width="150"
                                  >
                                     <template slot-scope="scope">
 
@@ -453,9 +472,9 @@
                                     style="width: 220px"
                             ></el-input>
                           </el-form-item>
-                          <el-form-item label="日期" prop="create_time"  required>
+                          <el-form-item label="日期" prop="trans_time"  required>
                             <el-date-picker
-                              v-model="formTransaction.create_time"
+                              v-model="formTransaction.trans_time"
                               type="datetime"
                               value-format="yyyy-MM-dd hh:mm:ss"
                                default-time="12:00:00"
@@ -688,15 +707,15 @@
               },
               drawerSubmitTransaction() {
                     const _this = this;
-                    let create_time = this.formTransaction.create_time
-                    if(create_time instanceof Date)
-                      create_time  = dayjs(create_time).format("YYYY-MM-DD HH:mm:ss")
+                    let trans_time = this.formTransaction.trans_time
+                    if(trans_time instanceof Date)
+                      trans_time  = dayjs(trans_time).format("YYYY-MM-DD HH:mm:ss")
                     this.$refs['formTransaction'].validate((valid) => {
                       if (valid) {
                            this.loading = true;
                           axios.post('/transcation/createorupdate',{
                               ...this.formTransaction,
-                              create_time: create_time
+                              trans_time: trans_time
                           },)
                           .then(function (response) {
                               _this.formTransaction = __init.formTransaction()
@@ -725,7 +744,7 @@
                             _this.formTransaction = {
                                 ...data,
                                 category: JSON.parse(data.category),
-                                create_time: new Date(data.create_time),
+                                trans_time: new Date(data.trans_time),
                             };
                         }
 
@@ -826,6 +845,23 @@
                   .then(function (response) {
                       _this.$message({
                           message: '提交成功',
+                          type: 'success'
+                      })
+                      _this.onSearchUpdate()
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+              },
+              onBatchDelete () {
+                  // 批量修改
+                  const _this = this
+                  axios.post('/transaction/batch/delete',{
+                      ids: this.multipleSelection,
+                  })
+                  .then(function (response) {
+                      _this.$message({
+                          message: '成功',
                           type: 'success'
                       })
                       _this.onSearchUpdate()

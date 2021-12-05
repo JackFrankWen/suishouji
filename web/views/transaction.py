@@ -138,7 +138,7 @@ def get_transaction_by_condition(query_con, pagination):
 
     condition = ''
     if query_con.get('picker'):
-        condition = ' AND create_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
+        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
 
     if query_con.get('accountType'):
         condition += " AND account_type = {}".format(query_con.get('accountType'))
@@ -163,13 +163,13 @@ def get_transaction_by_condition(query_con, pagination):
 
 
 
-    condition += " ORDER BY create_time DESC"
+    condition += " ORDER BY trans_time DESC"
 
     if query_con.get('currentPage'):
         offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
         condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
 
-    query_clause = "SELECT SQL_CALC_FOUND_ROWS * ,DATE_FORMAT(create_time, '%Y-%m-%d %T.%f') AS create_time FROM transaction WHERE flow_type=1"
+    query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
     query_clause += condition
     print(query_clause,'query_clause')
     return query_mysql(query_clause, '', pagination)
@@ -204,6 +204,13 @@ def create_or_update():
 def batch_update():
     data = request.get_json(force=True)
     batch_update_transcation(data)
+    return {'code': 200}
+
+
+@transaction_blueprint.route("/transaction/batch/delete", methods=['POST'])
+def batch_delete():
+    data = request.get_json(force=True)
+    batch_delete_transaction(data)
     return {'code': 200}
 
 
@@ -294,7 +301,7 @@ def insert_transcation(data):
                     "account_type, "
                     "payment_type, "
                     "consumer, "
-                    "create_time, "
+                    "trans_time, "
                     "tag) "
                   "VALUES ("
                     "{},"
@@ -313,7 +320,7 @@ def insert_transcation(data):
         data.get("account_type"),
         data.get("payment_type"),
         data.get("consumer"),
-        data.get("create_time"),
+        data.get("trans_time"),
         data.get("tag")
     )
     return run_mysql(query_clause, "")
@@ -326,7 +333,7 @@ def update_transcation(data):
                     'category = "{}",'
                     "payment_type = {},"
                     "consumer = {},"
-                    'create_time = "{}",'
+                    'trans_time = "{}",'
                     "tag = {},"
                     "account_type = {} "
            "WHERE id = {}").format(
@@ -334,12 +341,20 @@ def update_transcation(data):
         data['category'],
         data['payment_type'],
         data['consumer'],
-        data['create_time'],
+        data['trans_time'],
         data['tag'],
         data['account_type'],
         data['id'],
     )
     return run_mysql(query_clause, "")
+
+
+def batch_delete_transaction(data):
+
+    sql_list = str(tuple([key for key in data['ids']])).replace(',)', ')')
+    query_clause = ("DELETE FROM transaction "
+                    "WHERE id IN {}").format(sql_list)
+    return run_mysql(query_clause, '')
 
 
 def batch_update_transcation(data):

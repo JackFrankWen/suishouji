@@ -48,7 +48,7 @@ def read_data(csv):
     data_frame = pd.DataFrame(data_frame.values, columns=[
         'transactionNumber',  # 交易号
         'byNumber',  # 商家订单号---
-        'create_time',  # 交易创建时间
+        'trans_time',  # 交易创建时间
         'paymentTime',  # 付款时间----
         'updateTime',  # 付款时间----
         'transactionFrom',  # 交易来源地----
@@ -111,7 +111,7 @@ def read_data_wetchat(csv):
                           skiprows=16)
 
     data_frame = pd.DataFrame(data_frame.values, columns=[
-        'create_time',  # 交易时间
+        'trans_time',  # 交易时间
         'tran_type',  # 交易类型---
         'transaction_from',  # 交易对方
         'productName',  # 商品名称----

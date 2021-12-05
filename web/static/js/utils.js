@@ -1,6 +1,10 @@
 __utils = {
     formatDate: ( current_datetime ) => {
         if(current_datetime){
+            if (typeof current_datetime === 'string'){
+                const  re = current_datetime.replace('GMT','')
+                return dayjs(re).format("YYYY-MM-DD HH:mm")
+            }
             return dayjs(current_datetime).format("YYYY-MM-DD HH:mm")
         }
         return ''

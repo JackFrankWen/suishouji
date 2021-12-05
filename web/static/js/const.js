@@ -359,7 +359,7 @@ pickerOptions = {
 __init = {
     formTransaction() {
         return {
-                  create_time: undefined,
+                  trans_time: undefined,
                   category: undefined,
                   consumer: undefined,
                   payment_type: undefined,
@@ -372,7 +372,7 @@ __init = {
     },
     formTransactionRule() {
         return {
-                  create_time: [ { required: true, message: '必填', trigger: 'change' }],
+                  trans_time: [ { required: true, message: '必填', trigger: 'change' }],
                   category: [{ required: true, message: '必填', trigger: 'change' }],
                   consumer: [{ required: true, message: '必填', trigger: 'change' }],
                   payment_type: [{ required: true, message: '必填', trigger: 'change' }],
