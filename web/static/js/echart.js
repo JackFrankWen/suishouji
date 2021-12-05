@@ -1,4 +1,4 @@
-function pieInit() {
+function pieInit(data =[]) {
         var myChart = echarts.init(document.getElementById('pie-chart'));
                           // 指定图表的配置项和数据
                           var option = {
@@ -11,28 +11,7 @@ function pieInit() {
                                 {
                                   radius: ['40%', '70%'],
                                   type: 'pie',
-                                  data: [
-                                    {
-                                      value: 335,
-                                      name: '吃喝'
-                                    },
-                                    {
-                                      value: 335,
-                                      name: '购物消费'
-                                    },
-                                    {
-                                      value: 234,
-                                      name: '宝宝消费'
-                                    },
-                                    {
-                                      value: 234,
-                                      name: '联盟广告'
-                                    },
-                                    {
-                                      value: 1548,
-                                      name: '搜索引擎'
-                                    }
-                                  ]
+                                  data: data
                                 }
                               ]
                             };

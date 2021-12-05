@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one
 from web.api.upload import read_data, to_mysql, read_data_wetchat
+from web.api.transaction import get_transaction_by_condition
 from web.config import get_config
 import json
 import decimal
@@ -133,46 +134,6 @@ def get_all_rule():
     query = "SELECT * FROM match_rules "
     return query_mysql(query, '')
 
-
-def get_transaction_by_condition(query_con, pagination):
-
-    condition = ''
-    if query_con.get('picker'):
-        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('picker')[0], query_con.get('picker')[1])
-
-    if query_con.get('accountType'):
-        condition += " AND account_type = {}".format(query_con.get('accountType'))
-
-    if query_con.get('paymentType'):
-        condition += " AND payment_type = {}".format(query_con.get('paymentType'))
-
-    if query_con.get('description'):
-        condition += ' AND description LIKE "%{}%"'.format(query_con.get('description'))
-
-    if query_con.get('category'):
-        condition += ' AND json_contains(`category`, "{}") '.format(query_con.get('category'))
-
-    if query_con.get('query_null') == "2":
-        condition += ' AND consumer IS NULL'
-
-    if query_con.get('query_null') == "3":
-        condition += ' AND category IS NULL'
-
-    if query_con.get('query_null') == "4":
-        condition += ' AND tag IS NULL'
-
-
-
-    condition += " ORDER BY trans_time DESC"
-
-    if query_con.get('currentPage'):
-        offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
-        condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
-
-    query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
-    query_clause += condition
-    print(query_clause,'query_clause')
-    return query_mysql(query_clause, '', pagination)
 
 
 

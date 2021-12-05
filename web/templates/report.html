@@ -58,6 +58,7 @@
                                    <el-date-picker
                                       v-model="formPie.date"
                                       type="month"
+                                     value-format="yyyy-MM"
                                       placeholder="选择月">
                                     </el-date-picker>
                               </el-form-item>
@@ -133,7 +134,22 @@
                 }
               },
               methods: {
-                  onSearch(){},
+                  onSearch(){
+                      const _this = this
+                      const date = this.formPie.date;
+                      const firstDay = dayjs(date).format("YYYY-MM-DD HH:mm:ss")
+                      const endDay = dayjs(date).endOf('month').format("YYYY-MM-DD HH:mm:ss")
+                      axios.post('/report/month/bill',{
+                          categoryObj: __enum.getCategoryObj(),
+                          trans_time: [firstDay, endDay],..._this.formPie},
+                      )
+                        .then(function (res) {
+                            const data = res.data.data
+                               pieInit(data)
+                        }).catch(function (error) {
+                            console.log(error);
+                        });
+                  },
               },
               mounted() {
                   this.$nextTick(function () {

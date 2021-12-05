@@ -114,7 +114,7 @@
                             <el-form :inline="true" :model="formInline" class="demo-form-inline">
                               <el-form-item label="日期">
                                 <el-date-picker
-                                  v-model="formInline.picker"
+                                  v-model="formInline.trans_time"
                                   type="daterange"
                                   value-format="yyyy-MM-dd"
                                   @change="dateChange"
@@ -198,9 +198,17 @@
                                           <el-radio-button label="3">分类无</el-radio-button>
                                           <el-radio-button label="4">标签无</el-radio-button>
                                         </el-radio-group>
+                                        <el-time-picker
+                                            is-range
+                                            v-model="batchQueryForm.creation_time"
+                                            range-separator="至"
+                                            start-placeholder="开始时间"
+                                            end-placeholder="结束时间"
+                                            placeholder="选择时间范围">
+                                          </el-time-picker>
                                   </div>
                                 <el-date-picker
-                                  v-model="batchQueryForm.picker"
+                                  v-model="batchQueryForm.trans_time"
                                   type="daterange"
                                   value-format="yyyy-MM-dd"
                                   @change="dateChange"
@@ -369,7 +377,7 @@
                                   <template slot-scope="scope">{{ __utils.formatDate(scope.row.creation_time) }}</template>
                                 </el-table-column>
                                 <el-table-column
-                                  label="修改日时间"
+                                  label="最后修改"
                                   align="center"
                                   width="140">
                                   <template slot-scope="scope">{{ __utils.formatDate(scope.row.modification_time) }}</template>
