@@ -15,13 +15,13 @@
 
     </head>
     <body>
-        {% raw %}
         <div id="app">
 
             <div class="d-flex" id="wrapper">
                 <!-- Sidebar-->
                 <div class="border-end bg-white" id="sidebar-wrapper">
-                    <div class="sidebar-heading border-bottom bg-light">快速记</div>
+                    <div class="sidebar-heading border-bottom {{ classes}}">{{title}}</div>
+                    {% raw %}
                     <div class="list-group list-group-flush">
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=0" >概览</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=1">月账单</a>
@@ -99,8 +99,6 @@
         <!-- import axios -->
         <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
         <script type="text/javascript">
-        </script>
-        <script>
               // vue
              new Vue({
               el: '#app',
