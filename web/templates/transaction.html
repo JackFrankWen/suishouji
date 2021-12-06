@@ -25,7 +25,7 @@
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(1)">导入账单</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >账单汇总</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >修改明细</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >分析</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >规则查看</a>
                     </div>
                 </div>
                 <!-- Page content wrapper-->
@@ -409,7 +409,46 @@
                         </div>
                          <!--    分析  -->
                         <div v-show="activeType===4">
-                            <h1 class="mt-4">4</h1>
+                            <h1 class="mt-4">规则</h1>
+                            <el-table
+                                ref="singleTable"
+                                :data="tableRuleData"
+                                highlight-current-row
+                                @current-change="tableRuleRowChange"
+                                style="width: 100%">
+                                <el-table-column
+                                  label="分类"
+                                  >
+                                    <template slot-scope="scope">{{ __enum.getCategoryLabel(scope.row.category) }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  prop="rule"
+                                  label="规则"
+                                  align="center"
+                                  show-overflow-tooltip>
+                                </el-table-column>
+                                <el-table-column
+                                  label="成员"
+                                  width="120">
+                                     <template slot-scope="scope">{{ __enum.getConsumerKey(scope.row.consumer) }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  label="标签">
+                                     <template slot-scope="scope">{{ __enum.getTagKey(scope.row.tag) }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  label="创建时间"
+                                  align="center"
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.creation_time) }}</template>
+                                </el-table-column>
+                                <el-table-column
+                                  label="最后修改"
+                                  align="center"
+                                  width="140">
+                                  <template slot-scope="scope">{{ __utils.formatDate(scope.row.modification_time) }}</template>
+                                </el-table-column>
+                              </el-table>
                         </div>
                     </div>
                 </div>
@@ -571,6 +610,15 @@
               },
 
           },
+          created: function () {
+            const _this = this
+            axios.post('/rule/get/all')
+                            .then(function (response) {
+                                   _this.tableRuleData = response.data.list
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+          },
           data: function() {
             return {
                 visible: false,
@@ -603,6 +651,8 @@
 
                 tableData: [],
                 tableDataUpdate: [],
+                tableRuleData:[],
+                tableRuleCurrentRow: undefined,
                 multipleSelection: []
             }
           },
@@ -610,6 +660,9 @@
               handleCurrentChange(val) {
                 this.pagination.currentPage = val
                 this.onSearchUpdate()
+              },
+              tableRuleRowChange(val){
+                    this.tableRuleCurrentRow = val
               },
               redirectClick(obj){
                   this.activeType = 3

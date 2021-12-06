@@ -41,6 +41,15 @@ def add_rule():
     }
 
 
+@transaction_blueprint.route("/rule/get/all", methods=['POST'])
+def get_rule():
+
+    list = get_all_rule()
+    return {
+        "code": "200", "list": list
+    }
+
+
 def update_rule_by_id( data):
     query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {} WHERE id = {}'.format(
         data.get('rule'),
