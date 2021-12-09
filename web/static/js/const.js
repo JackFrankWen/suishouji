@@ -2,9 +2,13 @@
 //     payment_type INT COMMENT '付款类型 1.支付宝 2.微信 3.银行卡 4.现金',
 //     customer INT COMMENT '消费对象 1.家庭 2.老公 3.老婆 4.牧 ',
 //     tag INT COMMENT '标签 1.日常消费（买菜，沃尔玛） 2.一次性消费（零食，购物衣服） 3.固定消费（水电煤，油费，理发话费）'
-const general_cost = 1, variable_cost = 2, fix_cost = 3;
-const husband = 1, wife = 2, family = 3, son = 4;
-const __enum = {
+
+
+var __const =(function() {
+
+	const general_cost = 1, variable_cost = 2, fix_cost = 3;
+    const husband = 1, wife = 2, family = 3, son = 4;
+    const __enum = {
     accountType: {
         1: '老公钱包',
         2: '老婆钱包',
@@ -337,104 +341,115 @@ const __enum = {
     ],
 }
 
-pickerOptions = {
-                      shortcuts: [{
-                        text: '本月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m, 1);
-                            const lastDay = new Date(y, m+1, 0);
-                            picker.$emit('pick', [firstDay, lastDay]);
+    const pickerOptions = {
+                          shortcuts: [{
+                            text: '本月',
+                            onClick(picker) {
+                                const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                                const firstDay = new Date(y, m, 1);
+                                const lastDay = new Date(y, m+1, 0);
+                                picker.$emit('pick', [firstDay, lastDay]);
+                            }
+                          }, {
+                            text: '上个月',
+                            onClick(picker) {
+                                const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                                const firstDay = new Date(y, m-1, 1);
+                                const lastDay = new Date(y, m, 0);
+                              picker.$emit('pick', [firstDay, lastDay]);
+                            }
+                          }]
                         }
-                      }, {
-                        text: '上个月',
-                        onClick(picker) {
-                            const date = new Date(), y = date.getFullYear(), m = date.getMonth();
-                            const firstDay = new Date(y, m-1, 1);
-                            const lastDay = new Date(y, m, 0);
-                          picker.$emit('pick', [firstDay, lastDay]);
-                        }
-                      }]
+    const __init = {
+        formTransaction() {
+            return {
+                      trans_time: undefined,
+                      category: undefined,
+                      consumer: undefined,
+                      payment_type: undefined,
+                      amount: undefined,
+                      account_type: undefined,
+                      tag: undefined,
+                      description: undefined,
+                        action: 1,//1 新建 2 修改
                     }
-__init = {
-    formTransaction() {
-        return {
-                  trans_time: undefined,
-                  category: undefined,
-                  consumer: undefined,
-                  payment_type: undefined,
-                  amount: undefined,
-                  account_type: undefined,
-                  tag: undefined,
-                  description: undefined,
-                    action: 1,//1 新建 2 修改
-                }
-    },
-    formTransactionRule() {
-        return {
-                  trans_time: [ { required: true, message: '必填', trigger: 'change' }],
-                  category: [{ required: true, message: '必填', trigger: 'change' }],
-                  consumer: [{ required: true, message: '必填', trigger: 'change' }],
-                  payment_type: [{ required: true, message: '必填', trigger: 'change' }],
-                  amount: [{ required: true, message: '必填', trigger: 'change' }],
-                  account_type: [{ required: true, message: '必填', trigger: 'change' }],
-                  tag: [{ required: true, message: '必填', trigger: 'change' }],
-                  description: [{ required: true, message: '必填', trigger: 'change' }],
-                }
-    },
-    batchUpdateForm() {
-        return  {// 查账
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                }
-    },
-    formUpload() {
-        return { // 入账
-                    accountType: undefined,// 消费账户
-                    paymentType: undefined,
-                    consumer: undefined,
-                    fileList: [],
-                }
-    },
-    drawerForm() {
-        return {
-                    category: undefined,
-                    tag: undefined,
-                    rule: undefined,
-                    consumer: undefined,
-                }
-    },
-    formInline() {
-        return  {// 查账
-                    picker: undefined,
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                    pickerOptions: pickerOptions,
-                }
-    },
-    paginationInit() {
-        return    {
-                    currentPage: 1,
-                    pageSize: 20,
-                    total: 0,
-                }
-    },
-    batchQueryForm(obj) {
-        const init = {// 查账
-                    picker: undefined,
-                    paymentType: undefined,
-                    accountType: undefined,
-                    consumer: undefined,
-                    description: undefined,
-                    query_null: 1,
-                    pickerOptions: pickerOptions,
-                }
-        if(obj) return Object.assign({},init,obj)
-        return init
-    },
+        },
+        formTransactionRule() {
+            return {
+                      trans_time: [ { required: true, message: '必填', trigger: 'change' }],
+                      category: [{ required: true, message: '必填', trigger: 'change' }],
+                      consumer: [{ required: true, message: '必填', trigger: 'change' }],
+                      payment_type: [{ required: true, message: '必填', trigger: 'change' }],
+                      amount: [{ required: true, message: '必填', trigger: 'change' }],
+                      account_type: [{ required: true, message: '必填', trigger: 'change' }],
+                      tag: [{ required: true, message: '必填', trigger: 'change' }],
+                      description: [{ required: true, message: '必填', trigger: 'change' }],
+                    }
+        },
+        batchUpdateForm() {
+            return  {// 查账
+                        paymentType: undefined,
+                        accountType: undefined,
+                        consumer: undefined,
+                    }
+        },
+        formUpload() {
+            return { // 入账
+                        accountType: undefined,// 消费账户
+                        paymentType: undefined,
+                        consumer: undefined,
+                        fileList: [],
+                    }
+        },
+        drawerForm() {
+            return {
+                        category: undefined,
+                        tag: undefined,
+                        rule: undefined,
+                        consumer: undefined,
+                    }
+        },
+        formInline() {
+            return  {// 查账
+                        picker: undefined,
+                        paymentType: undefined,
+                        accountType: undefined,
+                        consumer: undefined,
+                        pickerOptions: pickerOptions,
+                    }
+        },
+        paginationInit() {
+            return    {
+                        currentPage: 1,
+                        pageSize: 20,
+                        total: 0,
+                    }
+        },
+        batchQueryForm(obj) {
+            const init = {// 查账
+                        picker: undefined,
+                        paymentType: undefined,
+                        accountType: undefined,
+                        consumer: undefined,
+                        description: undefined,
+                        query_null: 1,
+                        pickerOptions: pickerOptions,
+                    }
+            if(obj) return Object.assign({},init,obj)
+            return init
+        },
 
-}
+    }
 
 
+	// 返回对外公开的API
+	return {
+	    __enum : __enum,
+	    pickerOptions : pickerOptions,
+	    __init :  __init
+	}
+})();
+
+const __enum = __const.__enum
+const __init = __const.__init
+const __pickerOptions = __const.pickerOptions

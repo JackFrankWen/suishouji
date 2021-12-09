@@ -1,4 +1,4 @@
-__utils = {
+const __utils = {
     formatDate: ( current_datetime ) => {
         if(current_datetime){
             if (typeof current_datetime === 'string'){

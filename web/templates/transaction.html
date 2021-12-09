@@ -188,7 +188,7 @@
                             <bookkeep-alert-rule>
                             </bookkeep-alert-rule>
 
-                            <el-form :inline="true" :model="formInline" class="demo-form-inline mt-2">
+                            <el-form :inline="true" :model="batchQueryForm" class="demo-form-inline mt-2">
                                   <div class="col-12 mb-2">
                                         <el-radio-group
                                                 @change="quickSearch"
@@ -261,7 +261,7 @@
                                   <el-button type="primary" icon="el-icon-edit"  @click="onOpenTranscationDrawer(1)()">添加</el-button>
                               </el-form-item>
                             </el-form>
-                            <el-form :inline="true" :model="formInline" class="demo-form-inline bg-light pt-4">
+                            <el-form :inline="true" :model="batchUpdateForm" class="demo-form-inline bg-light pt-4">
                                </el-form-item>
                                     <el-cascader
                                         placeholder="分类修改为"

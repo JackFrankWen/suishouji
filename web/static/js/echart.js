@@ -18,38 +18,44 @@ function pieInit(data =[]) {
                           // 使用刚指定的配置项和数据显示图表。
                           myChart.setOption(option);
 }
-function barInit() {
+function barInit(data ={}) {
         var myChart = echarts.init(document.getElementById('bar-chart'));
                           // 指定图表的配置项和数据
                           var option = {
                               xAxis: {
-                                data: ['一月', '二月', '三月', '四月', '五月', '六月', '七月','八月','九月','十月','十月','十二月']
+                                data: data.label
                               },
                               yAxis: {},
                               series: [
                                 {
                                   type: 'bar',
-                                  data: new Array(12).fill(getRandomInt(22))
+                                  label:{
+                                      show:true,
+                                      formatter: (val)=>{
+                                          return __utils.numFormat(val.value,true)
+                                      }
+                                  },
+                                  data: data.value
                                 }
                               ]
                             };
                           // 使用刚指定的配置项和数据显示图表。
                           myChart.setOption(option);
 }
-function lineInit() {
+function lineInit(data) {
         var myChart = echarts.init(document.getElementById('line-chart'));
                           // 指定图表的配置项和数据
                           var option = {
                               xAxis: {
                                 type: 'category',
-                                data: ['A', 'B', 'C']
+                                data: data.label
                               },
                               yAxis: {
                                 type: 'value'
                               },
                               series: [
                                 {
-                                  data: [120, 200, 150],
+                                  data: data.value,
                                   type: 'line'
                                 }
                               ]
