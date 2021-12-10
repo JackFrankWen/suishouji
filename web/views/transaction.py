@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request
-from web.api.my_con import run_mysql, query_mysql, query_one
+from web.api.my_con import run_mysql, query_mysql, query_one, update_many
 from web.api.upload import read_data, to_mysql, read_data_wetchat
 from web.api.transaction import get_transaction_by_condition
 from web.config import get_config
+import re
 import json
 import decimal
 
@@ -190,13 +191,12 @@ def query_detail():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data, True)
 
-
     return {
         'code': 200,
         'data': list.get('data'),
         'total': list.get('total'),
-        'currentPage': data.get('currentPage'),
-        'pageSize': data.get('pageSize'),
+        'currentPage': list.get('currentPage'),
+        'pageSize': list.get('pageSize'),
     }
 
 
@@ -361,3 +361,30 @@ def batch_update_transcation(data):
 def delete_by_id(query_id):
     query_clause = 'DELETE FROM transaction WHERE id ={}'.format(query_id)
     return run_mysql(query_clause, '')
+
+
+@transaction_blueprint.route("/transaction/auto/classify", methods=['POST'])
+def auto_classify():
+    data = request.get_json(force=True)
+    list = get_transaction_by_condition(data, False)
+    match_list = get_match_rule_list(list)
+    msg = update_many(match_list, 'transaction')
+    return {'code': 200}
+
+
+
+def get_match_rule_list(list):
+    ruleList = get_all_rule()
+    match_list = []
+    for item in list:
+        for match_rule in ruleList:
+            pattern = re.compile(match_rule.get('rule'))
+            if pattern.search(item.get('description')):
+                item['category'] = match_rule.get('category')
+                item['tag'] = match_rule.get('tag')
+                del item['modification_time']
+                del item['creation_time']
+                if match_rule.get('consumer'):
+                    item['consumer'] = match_rule.get('consumer')
+                match_list.append(item)
+    return match_list

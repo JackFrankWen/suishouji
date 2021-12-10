@@ -32,10 +32,12 @@ def get_transaction_by_condition(query_con, pagination):
 
     condition += " ORDER BY trans_time DESC"
 
-    if query_con.get('currentPage'):
+    if query_con.get('currentPage') and pagination:
         offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
         condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
+        query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
+    else:
+        query_clause = "SELECT * FROM transaction WHERE flow_type=1"
 
-    query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
     query_clause += condition
     return query_mysql(query_clause, '', pagination)

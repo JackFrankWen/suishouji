@@ -162,7 +162,7 @@ var __const =(function() {
                       consumer: family,
                   }, {
                     value: 50008,
-                    label: '家具家电',
+                    label: '家装家电',
                       tag: fix_cost,
                       consumer: family,
                   }]

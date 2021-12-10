@@ -122,7 +122,8 @@ def get_transaction_sum_by_condition(query={}):
             where_clause += ' AND json_contains(`category`, "{}") '.format(query.get('category'))
         else:
             where_clause = ' WHERE json_contains(`category`, "{}") '.format(query.get('category'))
-    # if query.get('')
+
     query_clause = select_clause + where_clause + group_by
+
     print(query_clause)
     return query_mysql(query_clause, '')

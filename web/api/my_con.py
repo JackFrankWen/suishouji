@@ -100,3 +100,115 @@ def query_one(sql, data):
             print("Database does not exist")
         else:
             print(err)
+
+def update_many(data_list=None, mysql_table=None):
+    """
+    Updates a mysql table with the data provided. If the key is not unique, the
+    data will be inserted into the table.
+
+    The dictionaries must have all the same keys due to how the query is built.
+
+    Param:
+        data_list (List):
+            A list of dictionaries where the keys are the mysql table
+            column names, and the values are the update values
+        mysql_table (String):
+            The mysql table to be updated.
+    """
+    config = get_config()
+    try:
+        conn = mysql.connector.connect(
+            user=config.DB_USER,
+            passwd=config.DB_PASSWORD,
+            db=config.DB_NAME
+        )
+        cur = conn.cursor()
+
+        query = ""
+        values = []
+
+        for data_dict in data_list:
+
+            if not query:
+                columns = ', '.join('`{0}`'.format(k) for k in data_dict)
+                duplicates = ', '.join('{0}=VALUES({0})'.format(k) for k in data_dict)
+                place_holders = ', '.join('%s'.format(k) for k in data_dict)
+                query = "INSERT INTO {0} ({1}) VALUES ({2})".format(mysql_table, columns, place_holders)
+                query = "{0} ON DUPLICATE KEY UPDATE {1}".format(query, duplicates)
+
+            v = list(data_dict.values())
+            values.append(v)
+        
+        cur.executemany(query, values)
+        msg = conn.commit()
+        cur.close()
+        conn.close()
+        return msg
+    except mysql.connector.Error as err:
+        if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+            print("Something is wrong with your user name or password")
+        elif err.errno == errorcode.ER_BAD_DB_ERROR:
+            print("Database does not exist")
+        else:
+            conn.rollback()
+            print(err)
+
+# def update_many(data_list=None, mysql_table=None):
+#     """
+#     Updates a mysql table with the data provided. If the key is not unique, the
+#     data will be inserted into the table.
+# 
+#     The dictionaries must have all the same keys due to how the query is built.
+# 
+#     Param:
+#         data_list (List):
+#             A list of dictionaries where the keys are the mysql table
+#             column names, and the values are the update values
+#         mysql_table (String):
+#             The mysql table to be updated.
+#     """
+# 
+#     # Connection and Cursor
+#     config = get_config()
+#     conn = mysql.connector.connect(
+#         user=config.DB_USER,
+#         passwd=config.DB_PASSWORD,
+#         db=config.DB_NAME
+#     )
+#     cur = conn.cursor()
+# 
+#     query = ""
+#     values = []
+# 
+#     for data_dict in data_list:
+#         list_value = ""
+#         place_holders = ', '.join('"{}"'.format(data_dict[k]) for k in data_dict)
+#         if list_value:
+#             list_value += ',({})'.format(place_holders)
+#         else:
+#             list_value += '({})'.format(place_holders)
+#         if not query:
+#             columns = ', '.join('`{0}`'.format(k) for k in data_dict)
+#             duplicates = ', '.join('{0}=VALUES({0})'.format(k) for k in data_dict)
+# 
+#         v = data_dict.values()
+#         values.append(v)
+#     query = "INSERT INTO {0} ({1}) VALUES {2}".format(mysql_table, columns, list_value)
+#     query = "{0} ON DUPLICATE KEY UPDATE {1}".format(query, duplicates)
+#     print(query)
+#     try:
+#         msg = cur.executemany(query, "")
+#         return msg
+#     except mysql.connector.Error as err:
+#         if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+#             print("Something is wrong with your user name or password")
+#         elif err.errno == errorcode.ER_BAD_DB_ERROR:
+#             print("Database does not exist")
+#         else:
+#             print(err)
+#             conn.rollback()
+#             return msg
+# 
+#     conn.commit()
+#     cur.close()
+#     conn.close()
