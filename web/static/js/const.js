@@ -284,10 +284,12 @@ var __const =(function() {
                     value: 60002,
                     label: '回礼',
                       tag: variable_cost,
+                      consumer:family,
                   }, {
                     value: 60003,
                     label: '孝敬长辈',
-                      tag: variable_cost,
+                      tag: fix_cost,
+                      consumer:family,
                   }]
                 }, {
                   value: 70000,
@@ -312,6 +314,7 @@ var __const =(function() {
                     value: 80001,
                     label: '个人保险',
                       tag: fix_cost,
+                      consumer:family,
                   }, {
                     value: 80002,
                     label: '医疗费用',
@@ -342,7 +345,16 @@ var __const =(function() {
                 }, {
                   value: '00000',
                   label: '未分类',
-                  children: []
+                  children: [{
+                    value: 00001,
+                    label: '烂账',
+                  }, {
+                    value: 00002,
+                    label: '导入使用',
+                  }, {
+                    value: 00003,
+                    label: '历史未分类',
+                  }]
                 }
     ],
 }
@@ -362,6 +374,14 @@ var __const =(function() {
                                 const date = new Date(), y = date.getFullYear(), m = date.getMonth();
                                 const firstDay = new Date(y, m-1, 1);
                                 const lastDay = new Date(y, m, 0);
+                              picker.$emit('pick', [firstDay, lastDay]);
+                            }
+                          }, {
+                            text: '今年',
+                            onClick(picker) {
+                                const date = new Date(), y = date.getFullYear(), m = date.getMonth();
+                                const firstDay = new Date(y, 0, 1);
+                                const lastDay = new Date(y, 11, 31);
                               picker.$emit('pick', [firstDay, lastDay]);
                             }
                           }]
