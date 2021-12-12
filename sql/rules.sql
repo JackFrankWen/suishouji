@@ -8,3 +8,4 @@ CREATE TABLE IF NOT EXISTS `match_rules`(
     category JSON DEFAULT NULL COMMENT '分类'
 
 ) COMMENT = '分类';
+

@@ -344,7 +344,7 @@ var __const =(function() {
                   }]
                 }, {
                   value: '00000',
-                  label: '未分类',
+                  label: '未分类(请勿使用)',
                   children: [{
                     value: 00001,
                     label: '烂账',
