@@ -149,21 +149,23 @@
 
         </div>
         {% endraw %}
-        <!-- import Vue before Element -->
-         <script src="https://unpkg.com/vue/dist/vue.js"></script>
+         <!-- import Vue before Element -->
+        <script src="{{ url_for('static', filename='js/lib/vue.js') }}"></script>
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
-        <script src="{{ url_for('static', filename='js/echart.js') }}"></script>
         <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/bootstrap.js') }}"></script>
         <!-- dayjs -->
-        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/echarts@5.2.2/dist/echarts.js"></script>
-         <!-- import JavaScript -->
-        <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/dayjs.js') }}"></script>
+         <!-- import element-ui -->
+        <script src="{{ url_for('static', filename='js/lib/element-ui.js') }}"></script>
         <!-- import axios -->
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/axios.js') }}"></script>
+        <!-- import echarts -->
+        <script src="{{ url_for('static', filename='js/lib/echarts.js') }}"></script>
+          <!-- import componet.js -->
+        <script src="{{ url_for('static', filename='js/components.js') }}"></script>
         <script type="text/javascript">
               // vue
              new Vue({

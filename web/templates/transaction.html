@@ -11,7 +11,7 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{{ url_for('static', filename='css/transaction.css') }}" rel="stylesheet" />
         <!-- import CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/element-ui.css') }}">
 
     </head>
     <body>
@@ -248,8 +248,9 @@
                                 <el-input
                                         style="width: 160px"
                                         v-model="batchQueryForm.description"
+                                        @keyup.enter.native="onSearchUpdate"
                                         placeholder="搜索备注关键字">
-                                     <i slot="prefix" class="el-input__icon el-icon-search"></i>
+                                     <i slot="prefix" @click="onSearchUpdate" class="el-input__icon el-icon-search"></i>
                                 </el-input>
 
                               <el-form-item>
@@ -580,18 +581,18 @@
         </div>
         {% endraw %}
         <!-- import Vue before Element -->
-         <script src="https://unpkg.com/vue/dist/vue.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/vue.js') }}"></script>
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
         <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/js/bootstrap.bundle.min.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/bootstrap.js') }}"></script>
         <!-- dayjs -->
-        <script src="https://cdn.jsdelivr.net/npm/dayjs@1.10.7/dayjs.min.js"></script>
-         <!-- import JavaScript -->
-        <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/dayjs.js') }}"></script>
+         <!-- import element-ui -->
+        <script src="{{ url_for('static', filename='js/lib/element-ui.js') }}"></script>
         <!-- import axios -->
-        <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+        <script src="{{ url_for('static', filename='js/lib/axios.js') }}"></script>
           <!-- import componet.js -->
         <script src="{{ url_for('static', filename='js/components.js') }}"></script>
       <script>

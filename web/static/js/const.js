@@ -165,6 +165,11 @@ var __const =(function() {
                     label: '家装家电',
                       tag: fix_cost,
                       consumer: family,
+                  }, {
+                    value: 50009,
+                    label: '乐器',
+                        tag: variable_cost,
+                      consumer: family,
                   }]
                 }, {
                   value: 20000,
@@ -188,11 +193,11 @@ var __const =(function() {
                     value: 20004,
                     label: '物业费',
                        tag: fix_cost,
-                      consumer: family,
                   }, {
                     value: 20005,
                     label: '快递费',
                       tag: general_cost,
+                      consumer: family,
                   }, {
                     value: 20006,
                     label: '理发费',
@@ -315,6 +320,7 @@ var __const =(function() {
                     value: 80003,
                     label: '医疗杂物',
                       tag: fix_cost,
+                      consumer: family
                   }]
                 }, {
                   value: 90000,

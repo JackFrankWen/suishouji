@@ -138,7 +138,7 @@ def update_many(data_list=None, mysql_table=None):
 
             v = list(data_dict.values())
             values.append(v)
-        
+
         cur.executemany(query, values)
         msg = conn.commit()
         cur.close()
