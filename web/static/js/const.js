@@ -346,13 +346,13 @@ var __const =(function() {
                   value: '00000',
                   label: '未分类(请勿使用)',
                   children: [{
-                    value: 00001,
+                    value: '00001',
                     label: '烂账',
                   }, {
-                    value: 00002,
+                    value: '00002',
                     label: '导入使用',
                   }, {
-                    value: 00003,
+                    value: '00003',
                     label: '历史未分类',
                   }]
                 }

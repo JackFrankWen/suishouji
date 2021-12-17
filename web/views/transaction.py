@@ -51,7 +51,7 @@ def get_rule():
     }
 
 
-def update_rule_by_id( data):
+def update_rule_by_id(data):
     query_clause = 'UPDATE match_rules SET rule = "{}",category = "{}",tag = {} WHERE id = {}'.format(
         data.get('rule'),
         data.get('category'),
