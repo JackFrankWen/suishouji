@@ -343,16 +343,16 @@ var __const =(function() {
                       tag: variable_cost,
                   }]
                 }, {
-                  value: '00000',
+                  value: 100000,
                   label: '未分类(请勿使用)',
                   children: [{
-                    value: '00001',
+                    value: 100001,
                     label: '烂账',
                   }, {
-                    value: '00002',
+                    value: 100002,
                     label: '导入使用',
                   }, {
-                    value: '00003',
+                    value: 100003,
                     label: '历史未分类',
                   }]
                 }

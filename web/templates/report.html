@@ -243,7 +243,10 @@
                   formBarExport(){
                       const date = this.formBar.date
                       const trans_time = [date + '-01-01 00:00:00', date + '-12-31 23:59:59']
-                       axios.post('/report/excel/export',{trans_time})
+                      axios.post('/report/excel/export',{
+                            categoryObj: __enum.categoryType,
+                           trans_time
+                       })
                         .then(function (response) {
                             barInit(response.data.data)
                         }).catch(function (error) {

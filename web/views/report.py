@@ -13,6 +13,8 @@ from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one
 import xlwings as xw
 import json
+from datetime import datetime
+
 import decimal
 import os
 report_blueprint = Blueprint('report', __name__ ,
@@ -36,17 +38,45 @@ def month_bill():
 
 @report_blueprint.route("/report/excel/export", methods=['POST'])
 def export_year():
-    excel()
+    data = request.get_json(force=True)
+    list = get_transaction_category_sum_by_condition(data)
+    excel(data)
     return {'code': 200}
 
-def excel():
+def excel(data):
 
         wb = xw.Book()
         sheet = wb.sheets['Sheet1']
-        sheet.range('A1').value = [['Foo 1', 'Foo 2', 'Foo 3'], [10.0, 20.0, 30.0]]
+        add_sheel_colum(sheet, data.get("categoryObj"))
         cwd = os.getcwd()
-        wb.save(cwd+"\\excel\\test.xlsx")
+        now = datetime.now()
+        dt_string = now.strftime("%d/%m/%Y %H:%M")
+        file_name = "\\excel\\{}.xlsx".format(dt_string)
+        wb.save(cwd+"\\excel\\txt.xlsx")
         wb.close()
+
+
+def add_sheel_colum(sheet, list):
+    rowA1 = []
+    rowB1 = []
+    mergeArr = []
+
+    point = 1
+    mark = 2
+    for index, lvl1 in enumerate(list):
+        rowA1.append([lvl1.get("label")])
+        for index_2, lvl2 in enumerate(lvl1["children"]):
+            if index_2 > 0:
+                rowA1.append([''])
+            print(lvl2["label"],lvl2["value"])
+            point += 1
+            rowB1.append([lvl2.get("label")])
+        row = 'A{}:A{}'.format(mark, point)
+        mark = point + 1
+        sheet.range(row).merge()
+    sheet.range('A2').value = rowA1
+    sheet.range('B2').value = rowB1
+
 
 
 @report_blueprint.route("/report/month/track", methods=['POST'])
@@ -122,26 +152,38 @@ def get_list_amount(obj, categoryObj):
 
 
 def get_transaction_sum_by_condition(query={}):
-    select_clause = "SELECT  SUM(amount) AS total, MONTHNAME(trans_time) AS month FROM `transaction`"
+    select_clause = "SELECT SUM(amount) AS total, MONTHNAME(trans_time) AS month FROM `transaction`"
     group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time)"
-    where_clause = ''
+    where_clause = ' WHERE flow_type=1'
 
     if query.get('trans_time'):
-        where_clause = ' WHERE trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
+        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
 
     if query.get('consumer'):
-        if where_clause:
-            where_clause += ' AND consumer={}'.format(query.get('consumer')[0])
-        else:
-            where_clause = ' WHERE consumer={}'.format(query.get('consumer')[0])
+        where_clause += ' AND consumer={}'.format(query.get('consumer')[0])
 
     if query.get('category'):
-        if where_clause:
-            where_clause += ' AND json_contains(`category`, "{}") '.format(query.get('category'))
-        else:
-            where_clause = ' WHERE json_contains(`category`, "{}") '.format(query.get('category'))
+        where_clause += ' AND json_contains(`category`, "{}") '.format(query.get('category'))
 
     query_clause = select_clause + where_clause + group_by
 
     print(query_clause)
+    return query_mysql(query_clause, '')
+
+def get_transaction_category_sum_by_condition(query={}):
+    select_clause = "SELECT  SUM(amount) AS total, category,MONTHNAME(trans_time) AS month FROM `transaction`"
+    group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time), category"
+    where_clause = ' WHERE flow_type=1'
+
+    if query.get('trans_time'):
+        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
+
+    if query.get('consumer'):
+        where_clause += ' AND consumer={}'.format(query.get('consumer')[0])
+
+    if query.get('category'):
+        where_clause += ' AND json_contains(`category`, "{}") '.format(query.get('category'))
+
+    query_clause = select_clause + where_clause + group_by
+
     return query_mysql(query_clause, '')
