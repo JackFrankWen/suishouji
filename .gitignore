@@ -8,6 +8,7 @@ __pycache__/
 
 instance/
 data/
+excel/
 sql/backup/
 
 .pytest_cache/

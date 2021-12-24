@@ -11,9 +11,10 @@ from web.config import get_config
 from web.api.transaction import get_transaction_by_condition
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one
+import xlwings as xw
 import json
 import decimal
-
+import os
 report_blueprint = Blueprint('report', __name__ ,
                                   static_folder='web/static',
                                   template_folder='web/templates')
@@ -28,9 +29,24 @@ def transaction():
 @report_blueprint.route("/report/month/bill", methods=['POST'])
 def month_bill():
     data = request.get_json(force=True)
+
     list = get_transaction_by_condition(data, False)
     return_val = transform_data(list, data['categoryObj'])
     return {'code': 200, 'data': return_val}
+
+@report_blueprint.route("/report/excel/export", methods=['POST'])
+def export_year():
+    excel()
+    return {'code': 200}
+
+def excel():
+
+        wb = xw.Book()
+        sheet = wb.sheets['Sheet1']
+        sheet.range('A1').value = [['Foo 1', 'Foo 2', 'Foo 3'], [10.0, 20.0, 30.0]]
+        cwd = os.getcwd()
+        wb.save(cwd+"\\excel\\test.xlsx")
+        wb.close()
 
 
 @report_blueprint.route("/report/month/track", methods=['POST'])
@@ -43,7 +59,9 @@ def month_track():
 
 @report_blueprint.route("/report/get/month/amount", methods=['POST'])
 def year_sum():
-    list = get_transaction_sum_by_condition()
+    data = request.get_json(force=True)
+    print(data)
+    list = get_transaction_sum_by_condition(data)
     data = get_xAxis(list)
     return {'code': 200, 'data': data}
 
