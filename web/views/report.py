@@ -39,28 +39,63 @@ def month_bill():
 @report_blueprint.route("/report/excel/export", methods=['POST'])
 def export_year():
     data = request.get_json(force=True)
+
     list = get_transaction_category_sum_by_condition(data)
-    excel(data)
+    list = sort_list(list)
+
+    to_excel(data, list)
     return {'code': 200}
 
-def excel(data):
+
+def sort_list(list):
+    obj = {}
+    dictlist = []
+
+    for item in list:
+        if item["month"] in obj:
+            obj[item["month"]].append(item)
+        else:
+            obj[item["month"]] = []
+    for key, value in obj.items():
+        dictlist.append(value)
+    return dictlist
+
+
+
+def to_excel(data, list):
 
         wb = xw.Book()
         sheet = wb.sheets['Sheet1']
-        add_sheel_colum(sheet, data.get("categoryObj"))
-        cwd = os.getcwd()
-        now = datetime.now()
-        dt_string = now.strftime("%d/%m/%Y %H:%M")
-        file_name = "\\excel\\{}.xlsx".format(dt_string)
-        wb.save(cwd+"\\excel\\txt.xlsx")
-        wb.close()
+        set_colum_width(sheet)
+        category_index = add_sheel_colum(sheet, data.get("categoryObj"))
+        add_month_data(list, category_index, sheet)
+        save_and_close(wb)
+
+def set_colum_width(sheet):
+    sheet.range('A1').column_width = 17
+    sheet.range('B1').column_width = 17
+
+def set_colum_color():
+    a = (25,202,173)
+    b = (140,199,181)
+    c = (160,238,225)
+    d = (190,231,233)
+    f = (190,237,199)
+
+def save_and_close(wb):
+    cwd = os.getcwd()
+    now = datetime.now()
+    dt_string = now.strftime("%d/%m/%Y %H:%M")
+    file_name = "\\excel\\{}.xlsx".format(dt_string)
+    wb.save(cwd + "\\excel\\txt.xlsx")
+    wb.close()
 
 
 def add_sheel_colum(sheet, list):
     rowA1 = []
     rowB1 = []
     mergeArr = []
-
+    category_index = {}
     point = 1
     mark = 2
     for index, lvl1 in enumerate(list):
@@ -68,15 +103,38 @@ def add_sheel_colum(sheet, list):
         for index_2, lvl2 in enumerate(lvl1["children"]):
             if index_2 > 0:
                 rowA1.append([''])
-            print(lvl2["label"],lvl2["value"])
             point += 1
+            category_index[lvl2["value"]] = point
             rowB1.append([lvl2.get("label")])
         row = 'A{}:A{}'.format(mark, point)
         mark = point + 1
         sheet.range(row).merge()
     sheet.range('A2').value = rowA1
     sheet.range('B2').value = rowB1
+    return category_index
 
+
+def colnum_string(n):
+    string = ""
+    while n > 0:
+        n, remainder = divmod(n - 1, 26)
+        string = chr(65 + remainder) + string
+    return string
+
+def add_month_data(list, category_index, sheet):
+    colnum_id = 3
+    for sub_list in reversed(list):
+        for index,value in enumerate(sub_list):
+            colnum_str = colnum_string(colnum_id)
+            if index == 0:
+                str = colnum_str + "1"
+                sheet.range(str).value = [value["month"]]
+            if json.loads(value.get('category')):
+                category = json.loads(value.get('category'))[1]
+                place = category_index[category]
+                str = "{}{}".format(colnum_str, place)
+                sheet.range(str).value = [value["total"]]
+        colnum_id += 1
 
 
 @report_blueprint.route("/report/month/track", methods=['POST'])
@@ -90,7 +148,6 @@ def month_track():
 @report_blueprint.route("/report/get/month/amount", methods=['POST'])
 def year_sum():
     data = request.get_json(force=True)
-    print(data)
     list = get_transaction_sum_by_condition(data)
     data = get_xAxis(list)
     return {'code': 200, 'data': data}
