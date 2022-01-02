@@ -3,6 +3,7 @@ from web.api.my_con import run_mysql, query_mysql, query_one, update_many
 from web.api.upload import read_data, to_mysql, read_data_wetchat
 from web.api.transaction import get_transaction_by_condition
 from web.config import get_config
+from flask import Response
 import re
 import json
 import decimal
@@ -121,8 +122,9 @@ def upload_file():
             data['payment_type'] = request.form['paymentType']  # 导入长
             data['consumer'] = request.form['consumer']  # 导入长
             data = load_rule_data(data)
-            to_mysql(data)
-            return 'file uploaded successfully'
+            print(data,"msg")
+            res = to_mysql(data)
+            return Response(res.get("msg"),status=res.get("code"))
     return {'code': 200}
 
 
@@ -228,13 +230,13 @@ def transform_data(list, categoryObj):
                 obj[lvl1]['child'][lvl2] += amount
 
         else:
-            if '00000' not in obj.keys():
-                obj['00000'] = {
+            if '100000' not in obj.keys():
+                obj['100000'] = {
                     'amount': decimal.Decimal(0),
                     'child': {
                     }
                 }
-            obj['00000']['amount'] += amount
+            obj['100000']['amount'] += amount
 
     return get_list_amount(obj, categoryObj)
 

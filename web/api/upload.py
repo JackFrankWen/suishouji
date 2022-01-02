@@ -21,21 +21,27 @@ def to_mysql(dataFrame):
                          index=False,
                          if_exists='append'
                          )
+        code = 200
+        msg = "success"
     except ValueError as vx:
 
         print(vx)
-
+        msg = vx
+        code = 500
     except Exception as ex:
 
         print(ex)
-
+        msg = ex
+        code = 500
     else:
-
+        code = 200
         print("Table %s created successfully." % tableName)
 
     finally:
-
         dbConnection.close()
+        return {
+            "code": code,
+            "msg": msg}
 
 
 
@@ -125,7 +131,9 @@ def read_data_wetchat(csv):
     ])
 
     data_frame["description"] = data_frame["transaction_from"].str.strip() + ',' + data_frame["productName"].str.strip()
+    regEx = '[^\u0000-\uFFFF]'
 
+    data_frame["description"] = data_frame["description"].str.replace(regEx, '',regex =True)
     data_frame = data_frame[data_frame["tran_type"].str.contains("转入零钱通") == False]
 
     data_frame.loc[(data_frame['type'].str.contains("支出")), "flow_type"] = '1'
