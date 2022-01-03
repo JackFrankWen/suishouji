@@ -295,7 +295,7 @@
                                       <el-option v-for="op in selectOptionAccountType" :label="op.label" :value="op.value"></el-option>
                                     </el-select>
                               <el-form-item>
-                                <el-button type="primary" @click="onBatchUpdate" >确认修改</el-button>
+                                <el-button type="primary" :disabled="batchUpdateDisabled" @click="onBatchUpdate" >确认修改</el-button>
                                   <el-popconfirm
                                           title="确认删除？"
                                           @confirm="onBatchDelete()">
@@ -609,6 +609,10 @@
                   }
                   return true;
               },
+              batchUpdateDisabled(){
+                  if (this.multipleSelection.length >0 ) return false
+                  return true
+              }
 
           },
           created: function () {
