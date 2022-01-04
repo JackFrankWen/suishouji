@@ -23,7 +23,7 @@ function barInit(data ={}) {
                           // 指定图表的配置项和数据
                           var option = {
                               xAxis: {
-                                data: data.label
+                                data: __enum.monthToCH(data.label)
                               },
                               yAxis: {},
                               series: [
@@ -48,7 +48,7 @@ function lineInit(data) {
                           var option = {
                               xAxis: {
                                 type: 'category',
-                                data: data.label
+                                data: __enum.monthToCH(data.label)
                               },
                               yAxis: {
                                 type: 'value'
