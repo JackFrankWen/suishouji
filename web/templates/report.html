@@ -92,7 +92,9 @@
                                   </el-form-item>
                                </el-form>
                             <div id="bar-chart" style="width: 1400px;height:400px;"></div>
-
+                            <div>
+                                <h3>平均每月消费：{{formBarAVG}}</h3>
+                            </div>
                         </div>
                          <!--   消费趋势  -->
                         <div v-show="activeType===2">
@@ -133,7 +135,9 @@
                               </el-form-item>
                             </el-form>
                             <div id="line-chart" style="width: 1200px;height:400px;"></div>
-
+                            <div>
+                                <h3>平均每月消费：{{formLineAVG}}</h3>
+                            </div>
                         </div>
                          <!--    改账  -->
                         <div v-show="activeType===3" class="p-2">
@@ -184,6 +188,26 @@
                         console.log(error);
                     });
               },
+              computed:{
+                formLineAVG: function(){
+                    const arr = this.formLine.data;
+                    if(arr.length > 0) {
+                        total = arr.reduce((p,c)=>Number(p)+Number(c))
+                        console.log(total)
+                        return __utils.numFormat(total/arr.length)
+                    }
+                    return 0
+                },
+                formBarAVG: function(){
+                    const arr = this.formBar.data;
+                    if(arr.length > 0) {
+                        total = arr.reduce((p,c)=>Number(p)+Number(c))
+                        console.log(total)
+                        return __utils.numFormat(total/arr.length)
+                    }
+                    return 0
+                },
+              },
               data: function() {
                 return {
                     activeType: 0,
@@ -197,9 +221,11 @@
                         category: undefined,
                         consumer: undefined,
                         pickerOptions: __pickerOptions,
+                        data: [],
                     },
                     formBar:{
-                        date: undefined
+                        date: undefined,
+                        data: [],
                     },
 
                     selectOptionAccountType: __enum.getAccountType(),
@@ -218,24 +244,28 @@
                       val[1] = val[1] + "T23:59:59"
                       return val
                   },
-                  formLineSearch(){
-                      const _this =this
+                  formLineSearch() {
+                      const _this = this
                       axios.post('/report/month/track',{
                          ..._this.formLine},
                       )
                         .then(function (res) {
                             const data = res.data.data
                                lineInit(data)
+                               _this.formLine.data = data.value
                         }).catch(function (error) {
                             console.log(error);
                         });
                   },
-                  formBarSearch(){
+                  formBarSearch() {
+                      const _this = this
                       const date = this.formBar.date
                       const trans_time = [date + '-01-01 00:00:00', date + '-12-31 23:59:59']
                        axios.post('/report/get/month/amount',{trans_time})
-                        .then(function (response) {
-                            barInit(response.data.data)
+                        .then(function (res) {
+                            const data = res.data.data
+                            barInit(data)
+                            _this.formBar.data = data.value
                         }).catch(function (error) {
                             console.log(error);
                         });

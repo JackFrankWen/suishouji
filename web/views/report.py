@@ -123,7 +123,7 @@ def colnum_string(n):
 
 def add_month_data(list, category_index, sheet):
     colnum_id = 3
-    for sub_list in reversed(list):
+    for sub_list in list:
         for index,value in enumerate(sub_list):
             colnum_str = colnum_string(colnum_id)
             if index == 0:
@@ -157,7 +157,7 @@ def get_xAxis(list):
     array_label = []
     array_val = []
 
-    for item in reversed(list):
+    for item in list:
         array_label.append(item['month'])
         array_val.append(item['total'])
     return {'label': array_label, 'value': array_val}
@@ -210,7 +210,7 @@ def get_list_amount(obj, categoryObj):
 
 def get_transaction_sum_by_condition(query={}):
     select_clause = "SELECT SUM(amount) AS total, MONTHNAME(trans_time) AS month FROM `transaction`"
-    group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time)"
+    group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time) ORDER BY trans_time ASC"
     where_clause = ' WHERE flow_type=1'
 
     if query.get('trans_time'):
@@ -229,7 +229,7 @@ def get_transaction_sum_by_condition(query={}):
 
 def get_transaction_category_sum_by_condition(query={}):
     select_clause = "SELECT  SUM(amount) AS total, category,MONTHNAME(trans_time) AS month FROM `transaction`"
-    group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time), category"
+    group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time), category ORDER BY trans_time ASC"
     where_clause = ' WHERE flow_type=1'
 
     if query.get('trans_time'):
