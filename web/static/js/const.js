@@ -211,6 +211,7 @@ var __const =(function() {
                       value: 20004,
                       label: '物业费',
                         tag: fix_cost,
+                        consumer: family,
                     }, {
                       value: 20005,
                       label: '快递费',
@@ -228,6 +229,7 @@ var __const =(function() {
                       value: 20008,
                       label: 'VPN年费以及会员费',
                         tag: fix_cost,
+                        consumer: family,
                     }]
                   }, {
                     value: 40000,

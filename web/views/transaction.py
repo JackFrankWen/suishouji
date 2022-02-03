@@ -304,6 +304,7 @@ def update_transcation(data):
            'SET description = "{}",'
                     'category = "{}",'
                     "payment_type = {},"
+                    "amount = {},"
                     "consumer = {},"
                     'trans_time = "{}",'
                     "tag = {},"
@@ -312,6 +313,7 @@ def update_transcation(data):
         data['description'],
         data['category'],
         data['payment_type'],
+        data['amount'],
         data['consumer'],
         data['trans_time'],
         data['tag'],
