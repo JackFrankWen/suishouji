@@ -2,13 +2,16 @@ from web.api.my_con import run_mysql, query_mysql, query_one
 
 
 def get_transaction_by_condition(query_con, pagination):
-
     condition = ''
     if query_con.get('trans_time'):
-        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0], query_con.get('trans_time')[1])
+        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
+                                                                   query_con.get('trans_time')[1])
 
     if query_con.get('accountType'):
         condition += " AND account_type = {}".format(query_con.get('accountType'))
+
+    if query_con.get('consumer'):
+        condition += " AND consumer = {}".format(query_con.get('consumer'))
 
     if query_con.get('paymentType'):
         condition += " AND payment_type = {}".format(query_con.get('paymentType'))
@@ -28,12 +31,10 @@ def get_transaction_by_condition(query_con, pagination):
     if query_con.get('query_null') == "4":
         condition += ' AND tag IS NULL'
 
-
-
     condition += " ORDER BY trans_time DESC"
 
     if query_con.get('currentPage') and pagination:
-        offset = (int(query_con.get('currentPage'))-1) * int(query_con.get('pageSize'))
+        offset = (int(query_con.get('currentPage')) - 1) * int(query_con.get('pageSize'))
         condition += " LIMIT {} OFFSET {}".format(query_con.get('pageSize'), offset)
         query_clause = "SELECT SQL_CALC_FOUND_ROWS * FROM transaction WHERE flow_type=1"
     else:

@@ -217,7 +217,10 @@ def get_transaction_sum_by_condition(query={}):
         where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
 
     if query.get('consumer'):
-        where_clause += ' AND consumer={}'.format(query.get('consumer')[0])
+        where_clause += ' AND consumer={}'.format(query.get('consumer'))
+
+    if query.get('accountType'):
+        where_clause += ' AND account_type={}'.format(query.get('accountType'))
 
     if query.get('category'):
         where_clause += ' AND json_contains(`category`, "{}") '.format(query.get('category'))

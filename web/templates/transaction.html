@@ -27,7 +27,7 @@
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(1)">导入账单</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=2" >账单汇总</a>
                         <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=3" >修改明细</a>
-                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="activeType=4" >规则查看</a>
+                        <a class="list-group-item list-group-item-action list-group-item-light p-3" @click="onChangeTabs(4)" >规则查看</a>
                     </div>
                 </div>
                 <!-- Page content wrapper-->
@@ -615,15 +615,15 @@
               }
 
           },
-          created: function () {
-            const _this = this
-            axios.post('/rule/get/all')
-                            .then(function (response) {
-                                   _this.tableRuleData = response.data.list
-                            }).catch(function (error) {
-                                console.log(error);
-                            });
-          },
+          // created: function () {
+          //   const _this = this
+          //   axios.post('/rule/get/all')
+          //                   .then(function (response) {
+          //                          _this.tableRuleData = response.data.list
+          //                   }).catch(function (error) {
+          //                       console.log(error);
+          //                   });
+          // },
           data: function() {
             return {
                 visible: false,
@@ -749,7 +749,17 @@
                           this.formUpload = __init.formUpload()
                           this.activeType = 1;
                           this.activeStep = 0;
-                      }
+                      } else if (val === 4) {
+                         this.activeType = 4;
+                         const _this = this;
+                         axios.post('/rule/get/all')
+                            .then(function (response) {
+                                   _this.tableRuleData = response.data.list
+                            }).catch(function (error) {
+                                console.log(error);
+                            });
+                     }
+
               },
               dateChange(val){
                   val[0] = val[0] + "T00:00:00"
