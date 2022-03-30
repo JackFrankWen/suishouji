@@ -17,15 +17,16 @@ from datetime import datetime
 
 import decimal
 import os
-report_blueprint = Blueprint('report', __name__ ,
-                                  static_folder='web/static',
-                                  template_folder='web/templates')
+
+report_blueprint = Blueprint('report', __name__,
+                             static_folder='web/static',
+                             template_folder='web/templates')
 
 
 @report_blueprint.route("/report")
 def transaction():
     config = get_config()
-    return render_template('report.html',title=config.TITLE, classes=config.CLASSES)
+    return render_template('report.html', title=config.TITLE, classes=config.CLASSES)
 
 
 @report_blueprint.route("/report/month/bill", methods=['POST'])
@@ -35,6 +36,7 @@ def month_bill():
     list = get_transaction_by_condition(data, False)
     return_val = transform_data(list, data['categoryObj'])
     return {'code': 200, 'data': return_val}
+
 
 @report_blueprint.route("/report/excel/export", methods=['POST'])
 def export_year():
@@ -61,26 +63,27 @@ def sort_list(list):
     return dictlist
 
 
-
 def to_excel(data, list):
+    wb = xw.Book()
+    sheet = wb.sheets['Sheet1']
+    set_colum_width(sheet)
+    category_index = add_sheel_colum(sheet, data.get("categoryObj"))
+    add_month_data(list, category_index, sheet)
+    save_and_close(wb)
 
-        wb = xw.Book()
-        sheet = wb.sheets['Sheet1']
-        set_colum_width(sheet)
-        category_index = add_sheel_colum(sheet, data.get("categoryObj"))
-        add_month_data(list, category_index, sheet)
-        save_and_close(wb)
 
 def set_colum_width(sheet):
     sheet.range('A1').column_width = 17
     sheet.range('B1').column_width = 17
 
+
 def set_colum_color():
-    a = (25,202,173)
-    b = (140,199,181)
-    c = (160,238,225)
-    d = (190,231,233)
-    f = (190,237,199)
+    a = (25, 202, 173)
+    b = (140, 199, 181)
+    c = (160, 238, 225)
+    d = (190, 231, 233)
+    f = (190, 237, 199)
+
 
 def save_and_close(wb):
     cwd = os.getcwd()
@@ -121,10 +124,11 @@ def colnum_string(n):
         string = chr(65 + remainder) + string
     return string
 
+
 def add_month_data(list, category_index, sheet):
     colnum_id = 3
     for sub_list in list:
-        for index,value in enumerate(sub_list):
+        for index, value in enumerate(sub_list):
             colnum_str = colnum_string(colnum_id)
             if index == 0:
                 str = colnum_str + "1"
@@ -145,6 +149,7 @@ def month_track():
     return_val = get_xAxis(list)
     return {'code': 200, 'data': return_val}
 
+
 @report_blueprint.route("/report/get/month/amount", methods=['POST'])
 def year_sum():
     data = request.get_json(force=True)
@@ -164,7 +169,6 @@ def get_xAxis(list):
 
 
 def transform_data(list, categoryObj):
-
     obj = {}
 
     for item in list:
@@ -214,7 +218,8 @@ def get_transaction_sum_by_condition(query={}):
     where_clause = ' WHERE flow_type=1'
 
     if query.get('trans_time'):
-        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
+        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0],
+                                                                       query.get('trans_time')[1])
 
     if query.get('consumer'):
         where_clause += ' AND consumer={}'.format(query.get('consumer'))
@@ -230,13 +235,15 @@ def get_transaction_sum_by_condition(query={}):
     print(query_clause)
     return query_mysql(query_clause, '')
 
+
 def get_transaction_category_sum_by_condition(query={}):
     select_clause = "SELECT  SUM(amount) AS total, category,MONTHNAME(trans_time) AS month FROM `transaction`"
     group_by = " GROUP BY YEAR(trans_time), MONTH(trans_time), category ORDER BY trans_time ASC"
     where_clause = ' WHERE flow_type=1'
 
     if query.get('trans_time'):
-        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0], query.get('trans_time')[1])
+        where_clause += ' AND trans_time BETWEEN "{}" AND "{}"'.format(query.get('trans_time')[0],
+                                                                       query.get('trans_time')[1])
 
     if query.get('consumer'):
         where_clause += ' AND consumer={}'.format(query.get('consumer')[0])
