@@ -6,4 +6,5 @@ home_blueprint = Blueprint('home', __name__ ,
 
 @home_blueprint.route("/")
 def index():
+    """ D发 """
     return render_template('index.html')

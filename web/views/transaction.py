@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one, update_many
 from web.api.upload import read_data, to_mysql, read_data_wetchat
 from web.api.transaction import get_transaction_by_condition
+from web.api.word import create_doc
 from web.config import get_config
 from flask import Response
 import re
@@ -155,6 +156,18 @@ def query_category():
     list = get_transaction_by_condition(data, False)
     return_val = transform_data(list, data['categoryObj'])
     return {'code': 200, 'data': return_val}
+
+
+@transaction_blueprint.route("/transaction/export/word", methods=['POST'])
+def export_word():
+    data = request.get_json(force=True)
+    list = get_transaction_by_condition(data, False)
+    return_val = transform_data(list, data['categoryObj'])
+    data = {
+        "summary": return_val
+    }
+    create_doc(data)
+    return {'code': 200, 'data': 'sss'}
 
 
 @transaction_blueprint.route("/transcation/delete", methods=['POST'])

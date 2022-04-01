@@ -11,6 +11,8 @@ data/
 excel/
 sql/backup/
 
+*.docx
+
 .pytest_cache/
 .coverage
 htmlcov/

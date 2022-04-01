@@ -90,7 +90,7 @@ def save_and_close(wb):
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M")
     file_name = "\\excel\\{}.xlsx".format(dt_string)
-    wb.save(cwd + "\\excel\\txt.xlsx")
+    wb.save(cwd + file_name)
     wb.close()
 
 
