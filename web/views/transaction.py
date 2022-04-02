@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one, update_many
 from web.api.upload import read_data, to_mysql, read_data_wetchat
-from web.api.transaction import get_transaction_by_condition
+from web.api.transaction import get_transaction_by_condition, get_tag_amount_by_condition
 from web.api.word import create_doc
 from web.config import get_config
 from flask import Response
@@ -162,9 +162,11 @@ def query_category():
 def export_word():
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data, False)
+    tag_list = get_tag_amount_by_condition(data)
     return_val = transform_data(list, data['categoryObj'])
     data = {
-        "summary": return_val
+        "summary": return_val,
+        "tag": tag_list,
     }
     create_doc(data)
     return {'code': 200, 'data': 'sss'}

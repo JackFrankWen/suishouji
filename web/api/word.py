@@ -1,9 +1,9 @@
-# 生成word
-from docx import Document
-from datetime import datetime
-import decimal
+"""生成 word"""
 import os
-
+import decimal
+from datetime import datetime
+from docx import Document
+from web.enum.enum import Tag,TagString
 
 def create_doc(data):
     """create doc"""
@@ -11,11 +11,10 @@ def create_doc(data):
 
     document.add_heading('三月 账单', 0)
 
-    sectionSummry(document, data)
+    section_summary(document, data)
 
-    sectionCompare(document)
+    section_compare(document)
 
-    document.add_page_break()
 
     cwd = os.getcwd()
     now = datetime.now()
@@ -23,23 +22,43 @@ def create_doc(data):
     file_name = "\\demo\\{}.docx".format(dt_string)
     document.save('demo.docx')
 
-def sectionSummry(document, data):
+def get_tag_name(data):
+    return TagString[Tag(data).name]
+
+def section_summary(document, data):
+
     document.add_heading('标题1', level=1)
+    paragraph_summary(document, data)
+    paragraph_cost_from(document, data)
+
+def paragraph_cost_from(document, data):
+    detail = "消费来源："
+    for item in data['tag']:
+        """消费项目： 固定消费： 3000元， 变动消费：3300，"""
+        st = "【{}】{}元，".format(get_tag_name(item['tag']), item['total_amount'])
+        detail = detail + st
+    document.add_paragraph(detail)
+    document.add_paragraph('')
+
+def paragraph_summary(document, data):
     detail = "其中包括"
     amount = decimal.Decimal(0)
-    print(data)
+    total = "本月总支出 {} 元。".format(amount)
     for item in data['summary']:
         """本月总支出 【3333】 元。其中包括【食品吃喝】【3331】元，购物消费 【2】元。"""
-        st = "【{}】 【{}】元，".format(item['label'], item['amount'])
+        title = item['label']
+        cost = item['amount']
+        st = f"【{title}】{cost}元，"
         amount += decimal.Decimal(item['amount'])
         detail = detail + st
 
-    total = "本月总支出 【{}】 元。".format(amount)
-    document.add_paragraph(total+detail)
+    document.add_paragraph(total)
     document.add_paragraph('')
-    """钱包支出老公钱包 【2000】元， 老婆钱包【1333】元。"""
-    """消费占比： 家庭消费 【1111】元，占比45%。 牧牧消费 【1111】元， 消费元"""
+    document.add_paragraph(detail)
+    document.add_paragraph('')
 
-def sectionCompare(document):
+def section_compare(document):
     document.add_heading('标题2', level=1)
     document.add_paragraph('段落2')
+
+

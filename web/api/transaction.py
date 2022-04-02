@@ -42,3 +42,15 @@ def get_transaction_by_condition(query_con, pagination):
 
     query_clause += condition
     return query_mysql(query_clause, '', pagination)
+
+
+def get_tag_amount_by_condition(query_con):
+    if query_con.get('trans_time'):
+        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
+                                                                   query_con.get('trans_time')[1])
+
+    query_clause = "SELECT tag,SUM(amount) as total_amount FROM transaction WHERE flow_type=1"
+    group_by = "GROUP BY tag"
+    query = query_clause + condition + group_by
+
+    return query_mysql(query, '')
