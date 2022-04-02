@@ -3,7 +3,7 @@
 import decimal
 # from datetime import datetime
 from docx import Document
-from web.enum.enum import Tag,TagString
+from web.enum.enum import Tag,TagString, get_account_name,get_consumer_name
 
 def create_doc(data):
     """
@@ -41,7 +41,13 @@ def section_summary(document, data):
     :return:
     """
     document.add_heading('标题1', level=1)
+
     paragraph_summary(document, data)
+
+    paragraph_account_type(document, data)
+
+    paragraph_consumer(document, data)
+
     paragraph_cost_from(document, data)
 
 def paragraph_cost_from(document, data):
@@ -53,9 +59,39 @@ def paragraph_cost_from(document, data):
     """
     detail = "消费来源："
     for item in data['tag']:
-        tag_name = get_tag_name(item['tag'])
+        label = get_tag_name(item['tag'])
         cost = item['total_amount']
-        detail = detail + f"【{tag_name}】{cost}元，"
+        detail = detail + f"【{label}】{cost}元，"
+    document.add_paragraph(detail)
+    document.add_paragraph('')
+
+def paragraph_account_type(document, data):
+    """
+    钱包支出
+    :param document:
+    :param data:
+    :return:
+    """
+    detail = "钱包支出："
+    for item in data['account']:
+        label = get_account_name(item['account_type'])
+        cost = item['total_amount']
+        detail = detail + f"【{label}】{cost}元，"
+    document.add_paragraph(detail)
+    document.add_paragraph('')
+
+def paragraph_consumer(document, data):
+    """
+    成员支出
+    :param document:
+    :param data:
+    :return:
+    """
+    detail = "成员支出："
+    for item in data['consumer']:
+        label = get_consumer_name(item['consumer'])
+        cost = item['total_amount']
+        detail = detail + f"【{label}】{cost}元，"
     document.add_paragraph(detail)
     document.add_paragraph('')
 
