@@ -11,7 +11,7 @@ data/
 excel/
 sql/backup/
 
-*.docx
+demo.docx
 
 .pytest_cache/
 .coverage
