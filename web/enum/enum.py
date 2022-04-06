@@ -1,23 +1,25 @@
 from enum import Enum
-
+"""
+dff
+"""
 class Tag(Enum):
-   """  tag: {
+    """  tag: {
           1: '日常支出',
           2: '变动支出',
           3: '固定支出'
      	 general_cost = 1, variable_cost = 2, fix_cost = 3;
 
-      """
-   GENERAL_COST = 1
-   VARIABLE_COST = 2
-   FIX_COST = 3
+    """
+    GENERAL_COST = 1
+    VARIABLE_COST = 2
+    FIX_COST = 3
 
 class Account(Enum):
-   """  消费账户 1.老公钱包 2.老婆钱包
+      """  消费账户 1.老公钱包 2.老婆钱包
 
       """
-   HUSBAND = 1
-   WIFE = 2
+      HUSBAND = 1
+      WIFE = 2
 
 class Consumer(Enum):
    """  '消费对象 0.未分配 1.家庭 2.老公 3.老婆 4.牧 '
@@ -43,6 +45,7 @@ AccountString = {
    'HUSBAND': '老公钱包',
    'WIFE': '老婆钱包'
 }
+
 ConsumerString = {
    'HUSBAND': '老公',
    'WIFE': '老婆',

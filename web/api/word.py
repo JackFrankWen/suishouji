@@ -61,7 +61,8 @@ def paragraph_cost_from(document, data):
     for item in data['tag']:
         label = get_tag_name(item['tag'])
         cost = item['total_amount']
-        detail = detail + f"【{label}】{cost}元，"
+        percent = item['percent']
+        detail = detail + f"【{label}】{cost}元，占比 {percent}%。"
     document.add_paragraph(detail)
     document.add_paragraph('')
 
@@ -91,7 +92,8 @@ def paragraph_consumer(document, data):
     for item in data['consumer']:
         label = get_consumer_name(item['consumer'])
         cost = item['total_amount']
-        detail = detail + f"【{label}】{cost}元，"
+        percent = item['percent']
+        detail = detail + f"【{label}】{cost}元，占比 {percent}%。"
     document.add_paragraph(detail)
     document.add_paragraph('')
 

@@ -46,14 +46,24 @@ def get_transaction_by_condition(query_con, pagination):
 
 def get_tag_amount_by_condition(query_con):
     if query_con.get('trans_time'):
-        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
+        trans_time = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
                                                                    query_con.get('trans_time')[1])
 
-    query_clause = "SELECT tag,SUM(amount) as total_amount FROM transaction WHERE flow_type=1"
-    group_by = "GROUP BY tag"
-    query = query_clause + condition + group_by
+    query_clause = f"""
+    WITH transaction_co as
+         (
+            SELECT SUM(amount) as total FROM `transaction` 
+            WHERE flow_type = 1 {trans_time}
+        )
+    SELECT tag,
+        SUM(amount) as total_amount,
+        ROUND(SUM(amount)/transaction_co.total*100) as percent 
+    FROM transaction,transaction_co
+    WHERE flow_type=1 {trans_time}
+    GROUP BY tag
+    """
 
-    return query_mysql(query, '')
+    return query_mysql(query_clause, '')
 
 def get_account_by_condition(query_con):
     """
@@ -62,15 +72,17 @@ def get_account_by_condition(query_con):
     :return:
     """
     if query_con.get('trans_time'):
-        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
+        trans_time = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
                                                                    query_con.get('trans_time')[1])
 
-    query_clause = "SELECT account_type,SUM(amount) as total_amount FROM transaction WHERE flow_type=1"
-    group_by = "GROUP BY account_type"
-    query = query_clause + condition + group_by
+    query_clause = f"""
+    SELECT account_type,SUM(amount) as total_amount 
+    FROM transaction 
+    WHERE flow_type=1 {trans_time}
+    GROUP BY account_type
+    """
 
-    return query_mysql(query, '')
-
+    return query_mysql(query_clause, '')
 def get_consumer_by_condition(query_con):
     """
     get consumer
@@ -78,11 +90,19 @@ def get_consumer_by_condition(query_con):
     :return:
     """
     if query_con.get('trans_time'):
-        condition = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
+        trans_time = ' AND trans_time BETWEEN "{}" AND "{}"'.format(query_con.get('trans_time')[0],
                                                                    query_con.get('trans_time')[1])
-
-    query_clause = "SELECT consumer,SUM(amount) as total_amount FROM transaction WHERE flow_type = 1"
-    group_by = "GROUP BY consumer"
-    query = query_clause + condition + group_by
-
-    return query_mysql(query, '')
+    query_clause = f"""
+        WITH transaction_co as
+         (
+            SELECT SUM(amount) as total FROM `transaction` 
+            WHERE flow_type = 1 {trans_time}
+        )
+        SELECT consumer,
+            SUM(amount) as total_amount,
+            ROUND(SUM(amount)/transaction_co.total*100) as percent 
+        FROM transaction, transaction_co
+        WHERE flow_type = 1 {trans_time}
+        GROUP BY consumer
+    """
+    return query_mysql(query_clause, '')
