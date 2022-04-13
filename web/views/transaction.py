@@ -1,14 +1,21 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql, query_mysql, query_one, update_many
 from web.api.upload import read_data, to_mysql, read_data_wetchat
-from web.api.transaction import get_transaction_by_condition, get_tag_amount_by_condition, get_account_by_condition, get_consumer_by_condition
+from web.api.transaction import get_transaction_by_condition, \
+    get_tag_amount_by_condition, \
+    get_account_by_condition, \
+    get_consumer_by_condition,\
+    get_avg_of_last_quarter_amount,\
+    get_avg_of_last_year_month_cost
 from web.api.word import create_doc
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from web.config import get_config
 from flask import Response
 import re
 import json
 import decimal
-
+import copy
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -123,7 +130,6 @@ def upload_file():
             data['payment_type'] = request.form['paymentType']  # 导入长
             data['consumer'] = request.form['consumer']  # 导入长
             data = load_rule_data(data)
-            print(data,"msg")
             res = to_mysql(data)
             return Response(res.get("msg"),status=res.get("code"))
     return {'code': 200}
@@ -158,21 +164,81 @@ def query_category():
     return {'code': 200, 'data': return_val}
 
 
+def get_date_and_sub_month(str, sub_month):
+# TODO
+    """
+    :return:
+    """
+    date_time_obj = datetime.fromisoformat(str)
+    past_date = date_time_obj - relativedelta(months=sub_month)
+    return past_date
+
+
+def hand_data(data):
+    """
+
+    :param data:
+    :return:
+    """
+    new_data = copy.deepcopy(data)
+    if 'trans_time' in new_data:
+        new_data.get('trans_time')[0] = get_date_and_sub_month(new_data.get('trans_time')[0], 1)
+        new_data.get('trans_time')[1] = get_date_and_sub_month(new_data.get('trans_time')[1], 1)
+
+    return new_data
+
+
+def get_category_list(data):
+    """
+
+    :param data:
+    :return:
+    """
+    list = get_transaction_by_condition(data, False)
+    category_list = transform_data(list, data['categoryObj'])
+    return category_list
+
+
+def get_category_list_last_month(data):
+    """
+
+    :param data:
+    :return:
+    """
+    print('===222====')
+    print(data)
+    print('=======')
+    list_last = get_transaction_by_condition(data, False)
+
+    category_list_last_month = transform_data(list_last, data['categoryObj'])
+    return category_list_last_month
+
+
 @transaction_blueprint.route("/transaction/export/word", methods=['POST'])
 def export_word():
     data = request.get_json(force=True)
-    list = get_transaction_by_condition(data, False)
-    tag_list = get_tag_amount_by_condition(data)
-    account_list = get_account_by_condition(data)
-    consumer_list = get_consumer_by_condition(data)
-    return_val = transform_data(list, data['categoryObj'])
-    data = {
-        "summary": return_val,
-        "tag": tag_list,
-        "consumer": consumer_list,
-        "account": account_list,
+    last = hand_data(data)
+
+    print('===88888888========')
+    print(data)
+    print(last)
+    print('=====88888888======')
+    last_year_month_cost_avg = get_avg_of_last_year_month_cost()
+    avg_of_last_quarter_amount = get_avg_of_last_quarter_amount(data)
+
+    doc_data = {
+        "category": get_category_list(data),
+        "category_last_month": get_category_list_last_month(last),
+
+        "last_year_month_cost_avg": last_year_month_cost_avg,
+        "avg_of_last_quarter_amount": avg_of_last_quarter_amount,
+
+        "tag": get_tag_amount_by_condition(data),
+        "consumer": get_consumer_by_condition(data),
+        "account": get_account_by_condition(data),
     }
-    create_doc(data)
+
+    create_doc(doc_data)
     return {'code': 200, 'data': 'sss'}
 
 

@@ -14,9 +14,10 @@ def create_doc(data):
 
     document.add_heading('三月 账单', 0)
 
-    section_summary(document, data)
+    render_data = paragraph_summary(data)
+    section_summary(document, data, render_data)
 
-    section_compare(document)
+    section_compare(document, data, render_data)
 
 
     # cwd = os.getcwd()
@@ -24,6 +25,8 @@ def create_doc(data):
     # dt_string = now.strftime("%d/%m/%Y %H:%M")
     # file_name = "\\demo\\{}.docx".format(dt_string)
     document.save('demo.docx')
+
+
 
 def get_tag_name(data):
     """
@@ -33,7 +36,7 @@ def get_tag_name(data):
     """
     return TagString[Tag(data).name]
 
-def section_summary(document, data):
+def section_summary(document, data,render_data):
     """
 
     :param document:
@@ -41,14 +44,25 @@ def section_summary(document, data):
     :return:
     """
     document.add_heading('标题1', level=1)
-
-    paragraph_summary(document, data)
+    render_summary(document, render_data)
 
     paragraph_account_type(document, data)
 
     paragraph_consumer(document, data)
 
     paragraph_cost_from(document, data)
+
+def render_summary(document, render_data):
+    """
+
+    :param document:
+    :param render_data:
+    :return:
+    """
+    document.add_paragraph(render_data.get("total_txt"))
+    document.add_paragraph('')
+    document.add_paragraph(render_data.get("detail_current_month"))
+    document.add_paragraph('')
 
 def paragraph_cost_from(document, data):
     """
@@ -97,7 +111,7 @@ def paragraph_consumer(document, data):
     document.add_paragraph(detail)
     document.add_paragraph('')
 
-def paragraph_summary(document, data):
+def paragraph_summary(data):
     """
     本月总支出 【3333】 元。
     其中包括【食品吃喝】【3331】元，购物消费 【2】元。
@@ -107,22 +121,81 @@ def paragraph_summary(document, data):
     """
     detail = "其中包括"
     total = decimal.Decimal(0)
-    for item in data['summary']:
+    for item in data['category']:
         title = item['label']
         cost = item['amount']
         total += decimal.Decimal(item['amount'])
         detail = detail + f"【{title}】{cost}元，"
 
-    document.add_paragraph(f"本月总支出 {total} 元。")
-    document.add_paragraph('')
-    document.add_paragraph(detail)
-    document.add_paragraph('')
 
-def section_compare(document):
+    total_txt = f"本月总支出 {total} 元。"
+
+    detail_current_month = detail
+
+    lastde = "其中包括"
+    total_last_month = decimal.Decimal(0)
+    for item in data['category_last_month']:
+        item_id = item.get('id')
+        # data.get('category').get()
+        title = item.get('label')
+        cost = item.get('amount')
+        total_last_month += decimal.Decimal(item.get('amount'))
+        lastde = lastde + f"【{title}】{cost}元，"
+
+    last_year_month_cost_avg_txt = compare_sentence(total, data.get("last_year_month_cost_avg")[0].get("month_avg"))
+    avg_of_last_quarter_amount_txt = compare_sentence(total, data.get("avg_of_last_quarter_amount")[0].get("month_avg"))
+    compare_last_month_total = compare_sentence(total, total_last_month)
+
+    compare_last_total_txt = f"总支出对比上月 {compare_last_month_total} ，"
+    compare_last_year_month_cost_avg_txt = f" 对比去年每月平均{last_year_month_cost_avg_txt}"
+    compare_avg_of_last_quarter_amount_txt = f" 对比上个季度每月平均{avg_of_last_quarter_amount_txt}"
+
+    return {
+        'total_txt': total_txt,
+        'compare_last_total_txt': compare_last_total_txt,
+        'detail_current_month': detail_current_month,
+        'last_year_month_cost_avg_txt': compare_last_year_month_cost_avg_txt,
+        'compare_avg_of_last_quarter_amount_txt': compare_avg_of_last_quarter_amount_txt,
+    }
+
+def section_compare(document, data, render_data):
     """
     d段落二
     :param document:
     :return:
     """
     document.add_heading('标题2', level=1)
-    document.add_paragraph('段落2')
+    render_summary_compare(document, render_data)
+
+
+
+def render_summary_compare(document, render_data):
+    """
+
+    :param document:
+    :param render_data:
+    :return:
+    """
+    para = (render_data.get("compare_last_total_txt")
+            + render_data.get("last_year_month_cost_avg_txt")
+            + render_data.get("compare_avg_of_last_quarter_amount_txt"))
+    document.add_paragraph(para)
+    document.add_paragraph('')
+
+def compare_sentence(cur, old):
+    """
+    对比
+    :param a:
+    :param b:
+    :return:
+    """
+    sentence = ''
+    cost = round(cur - old,2)
+    if cost > 0:
+        sentence = f"增加了{cost}元"
+    elif cost == 0:
+        sentence = "不变"
+    else:
+        sentence = f"减少了{abs(cost)} 元 "
+
+    return sentence
