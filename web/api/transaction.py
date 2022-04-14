@@ -65,6 +65,7 @@ def get_tag_amount_by_condition(query_con):
     """
     return query_mysql(query_clause, '')
 
+
 def get_account_by_condition(query_con):
     """
 
@@ -83,6 +84,7 @@ def get_account_by_condition(query_con):
     """
 
     return query_mysql(query_clause, '')
+
 
 def get_consumer_by_condition(query_con):
     """

@@ -232,7 +232,6 @@ def get_transaction_sum_by_condition(query={}):
 
     query_clause = select_clause + where_clause + group_by
 
-    print(query_clause)
     return query_mysql(query_clause, '')
 
 

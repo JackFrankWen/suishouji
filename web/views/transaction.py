@@ -89,8 +89,7 @@ def insert_rule_table(data):
         data.get('rule'),
     )
 
-
-    if (data.get('consumer')):
+    if data.get('consumer'):
         feild = "(category, tag, rule, consumer) "
         feild_value = 'VALUES ("{}", {}, "{}", {})'.format(
             data.get('category'),
@@ -158,9 +157,13 @@ def get_all_rule():
 
 @transaction_blueprint.route("/transaction/query/category", methods=['POST'])
 def query_category():
+    """
+    日常收支表/ 查账
+    :return:
+    """
     data = request.get_json(force=True)
     list = get_transaction_by_condition(data, False)
-    return_val = transform_data(list, data['categoryObj'])
+    return_val = transform_data(list, data['categoryObj']).get("amount_list")
     return {'code': 200, 'data': return_val}
 
 
@@ -205,9 +208,6 @@ def get_category_list_last_month(data):
     :param data:
     :return:
     """
-    print('===222====')
-    print(data)
-    print('=======')
     list_last = get_transaction_by_condition(data, False)
 
     category_list_last_month = transform_data(list_last, data['categoryObj'])
@@ -215,7 +215,7 @@ def get_category_list_last_month(data):
 
 
 @transaction_blueprint.route("/transaction/export/word", methods=['POST'])
-def export_word():
+def export_to_word():
     data = request.get_json(force=True)
     last = hand_data(data)
 
@@ -227,8 +227,9 @@ def export_word():
     avg_of_last_quarter_amount = get_avg_of_last_quarter_amount(data)
 
     doc_data = {
-        "category": get_category_list(data),
-        "category_last_month": get_category_list_last_month(last),
+        "category": get_category_list(data).get("amount_list"),
+        "category_last_month": get_category_list_last_month(last).get("amount_list"),
+        "category_last_month_obj": get_category_list_last_month(last).get("amount_list_obj"),
 
         "last_year_month_cost_avg": last_year_month_cost_avg,
         "avg_of_last_quarter_amount": avg_of_last_quarter_amount,
@@ -258,6 +259,7 @@ def create_or_update():
         update_transcation(data)
     return {'code': 200}
 
+
 @transaction_blueprint.route("/transaction/batch/update", methods=['POST'])
 def batch_update():
     data = request.get_json(force=True)
@@ -286,12 +288,14 @@ def query_detail():
         'pageSize': list.get('pageSize'),
     }
 
+def handle_list_to_obj(category_list):
+    """
 
-def transform_data(list, categoryObj):
-
+    :return:
+    """
     obj = {}
 
-    for item in list:
+    for item in category_list:
         amount = item['amount']
         if item['category']:
             arr = json.loads(item['category'])
@@ -323,7 +327,22 @@ def transform_data(list, categoryObj):
                 }
             obj['100000']['amount'] += amount
 
-    return get_list_amount(obj, categoryObj)
+    return obj
+
+
+def transform_data(category_list, category_obj):
+    """
+
+    :param category_list:
+    :param category_obj:
+    :return:
+    """
+    obj = handle_list_to_obj(category_list)
+    table_list = get_list_amount(obj, category_obj)
+    return {
+        "amount_list": table_list,
+        "amount_list_obj": obj,
+    }
 
 
 def get_list_amount(obj, categoryObj):
