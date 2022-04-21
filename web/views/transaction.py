@@ -214,15 +214,25 @@ def get_category_list_last_month(data):
     return category_list_last_month
 
 
+def array_to_dict(object_list, key):
+    """
+
+    :param object_list:
+    :param key:
+    :return:
+    """
+    obj = {}
+    for item in object_list:
+        obj[item[key]] = item
+
+    return obj
+
+
 @transaction_blueprint.route("/transaction/export/word", methods=['POST'])
 def export_to_word():
     data = request.get_json(force=True)
     last = hand_data(data)
 
-    print('===88888888========')
-    print(data)
-    print(last)
-    print('=====88888888======')
     last_year_month_cost_avg = get_avg_of_last_year_month_cost()
     avg_of_last_quarter_amount = get_avg_of_last_quarter_amount(data)
 
@@ -235,7 +245,11 @@ def export_to_word():
         "avg_of_last_quarter_amount": avg_of_last_quarter_amount,
 
         "tag": get_tag_amount_by_condition(data),
+        "tag_last_month": get_tag_amount_by_condition(last),
+        "tag_last_month_dict": array_to_dict(get_tag_amount_by_condition(last), "tag"),
         "consumer": get_consumer_by_condition(data),
+        "consumer_last_month": get_consumer_by_condition(last),
+        "consumer_last_month_dict": array_to_dict(get_consumer_by_condition(last), "consumer"),
         "account": get_account_by_condition(data),
     }
 
@@ -287,6 +301,7 @@ def query_detail():
         'currentPage': list.get('currentPage'),
         'pageSize': list.get('pageSize'),
     }
+
 
 def handle_list_to_obj(category_list):
     """
