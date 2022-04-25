@@ -9,7 +9,8 @@
         <!-- Favicon-->
         <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
         <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="{{ url_for('static', filename='css/transaction.css') }}" rel="stylesheet" />
+<!--        <link href="{{ url_for('static', filename='css/transaction.css') }}" rel="stylesheet" />-->
+        <link href="/static/css/transaction.css" rel="stylesheet" />
 
         <!-- import CSS -->
         <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
@@ -584,7 +585,8 @@
         </div>
         {% endraw %}
         <!-- import Vue before Element -->
-        <script src="{{ url_for('static', filename='js/lib/vue.js') }}"></script>
+<!--        <script src="{{ url_for('static', filename='js/lib/vue.js') }}"></script>-->
+        <script src="/static/js/lib/vue.js?ti=22"></script>
         <!-- import enum.js -->
         <script src="{{ url_for('static', filename='js/const.js') }}"></script>
         <script src="{{ url_for('static', filename='js/utils.js') }}"></script>
