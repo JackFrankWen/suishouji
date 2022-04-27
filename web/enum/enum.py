@@ -49,17 +49,27 @@ class Risk(Enum):
 
 
 def to_dict_risk_rank():
+    """
+
+    :return:
+    """
     risk = {i.value: i.name for i in Risk}
+    return_array = []
     for key, value in risk.items():
-        risk[key] = RiskString[value]
-    return risk
+        return_array.append({'label': RiskString[value], 'value': key})
+    return return_array
 
 
 def to_dict_account_type():
+    """
+
+    :return:
+    """
     account_dict = {i.value: i.name for i in Account}
+    return_array = []
     for key, value in account_dict.items():
-        account_dict[key] = AccountString[value]
-    return account_dict
+        return_array.append({'label': AccountString[value], 'value': key})
+    return return_array
 
 
 def to_dict_consumer():
@@ -70,7 +80,7 @@ def to_dict_consumer():
 
 
 RiskString = {
-   'ZERO': '无风险（保本）',
+   'ZERO': '零风险（保本）',
    'LOW': '低风险',
    'MEDIUM': '中风险',
    'HIGH': '高风险'

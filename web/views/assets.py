@@ -2,6 +2,7 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql
 from web.enum.enum import to_dict_consumer,to_dict_risk_rank,to_dict_account_type
+import json
 
 assets_blueprint = Blueprint('assets', __name__ ,
                            static_folder='web/static',
@@ -14,11 +15,15 @@ def assets_cate_insert():
     """
     获取接口
     """
-    data = request.get_json(force=True)
-    if data.get('id'):
-        assets_cate_update(data)
-    else:
-        assets_cate_create(data)
+    try:
+        data = request.get_data()
+        data = json.loads(data)
+        if data.get('id'):
+            assets_cate_update(data)
+        else:
+            assets_cate_create(data)
+    except  BaseException as err:
+        print(err)
     return {'data': 200}
 
 
@@ -31,10 +36,13 @@ def assets_enum():
     data = to_dict_consumer()
     risk_rank = to_dict_risk_rank()
     account_type = to_dict_account_type()
-
-    return {'consumer': data,
-            'risk_rank': risk_rank,
-            'account_type': account_type,
+    dict_data = {
+        'consumer': data,
+        'risk_rank': risk_rank,
+        'account_type': account_type,
+    }
+    return {'code': 200,
+            'data': dict_data
             }
 
 
@@ -45,6 +53,7 @@ def assets_cate_create(data):
          (description, category, account_type, risk_rank)
          VALUES ("{data.get('description')}", "{data.get('category')}",  {data.get('account_type')}, {data.get('risk_rank')})
         """
+    print(query_clause)
     run_mysql(query_clause, "")
 
 
