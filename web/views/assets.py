@@ -209,8 +209,7 @@ def assets_update(data):
     """更新 assets表更新"""
     query_clause = f"""
     UPDATE assets
-    SET amount="{data.get('amount')}",
-    record_time="{data.get('record_time')}"
+    SET amount="{data.get('amount')}"
     WHERE id = {data.get('id')}
     """
     run_mysql(query_clause, "")
