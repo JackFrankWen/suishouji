@@ -99,17 +99,37 @@ def assets_create(data):
 
 @assets_blueprint.route("/assets/cate/get", methods=['POST'])
 def get_assets_cate():
-    data = request.get_json(force=True)
-
     """
     获取接口
     """
 
-    query = f"""SELECT * FROM assets_cate
-    where account_type = {data.get('account_type')}
+    data = request.get_json(force=True)
+    return {'data': query_assets_cate(data), 'code': 200}
+
+
+def query_assets_cate(data):
     """
-    data = query_mysql(query, '')
-    return {'data': data, 'code': 200}
+       获取接口
+       """
+
+    query = f"""SELECT * FROM assets_cate
+       where account_type = {data.get('account_type')}
+       """
+    return query_mysql(query, '')
+
+
+def query_assets(data):
+    """
+       获取接口
+       """
+
+    query = f"""
+        SELECT a.id, amount,assets_cate_id, record_time,a.creation_time,a.modification_time,MONTH(record_time) AS month
+        FROM assets AS a,assets_cate AS b 
+        WHERE b.account_type = {data.get('account_type')} AND b.id = a.assets_cate_id 
+        ORDER BY record_time asc
+    """
+    return query_mysql(query, '')
 
 
 @assets_blueprint.route("/assets/get", methods=['POST'])
@@ -119,12 +139,24 @@ def get_assets():
     """
     data = request.get_json(force=True)
 
-    query = f"""SELECT * FROM assets_cate 
-    where account_type = {data.get('account_type')}
-    """
-    data = query_mysql(query, '')
+    assets_cate = query_assets_cate(data)
+    list_assets = query_assets(data)
+    data = transform_data(assets_cate, list_assets)
+
     return {'data': data, 'code': 200}
 
+
+def transform_data(assets_cate_list, assets_list):
+    for assets_cate in assets_cate_list:
+        for assets in assets_list:
+            if assets_cate.get('id') == assets.get('assets_cate_id'):
+                key = f"""month_{assets.get('month')}"""
+                if assets_cate.get(key):
+                    assets_cate[key].append(assets)
+                else:
+                    assets_cate[key] = []
+                    assets_cate[key].append(assets)
+    return assets_cate_list
 
 @assets_blueprint.route("/assets/enum", methods=['POST'])
 def assets_enum():
