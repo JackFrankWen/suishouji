@@ -1,7 +1,7 @@
-from enum import Enum
 """
 dff
 """
+from enum import Enum
 class Tag(Enum):
     """  tag: {
           1: '日常支出',
@@ -106,18 +106,26 @@ ConsumerString = {
 
 
 def get_account_name(data):
-       """
+    """
+    :param data:
+    :return:
+    """
+    return AccountString[Account(data).name]
 
-       :param data:
-       :return:
-       """
-       return AccountString[Account(data).name]
+
+def get_risk_name(data):
+    """
+    :param data:
+    :return:
+    """
+    return RiskString[Risk(data).name]
+
 
 
 def get_consumer_name(data):
-       """
+    """
 
-       :param data:
-       :return:
-       """
-       return ConsumerString[Consumer(data).name]
+    :param data:
+    :return:
+    """
+    return ConsumerString[Consumer(data).name]

@@ -466,10 +466,10 @@
               ref="drawer"
               >
                 <div class="demo-drawer__content">
-                    <el-form ref="form" :model="formTransaction" label-width="80px">
+                    <el-form ref="drawerFormRef" :model="drawerForm" label-width="80px">
                       <bookkeep-alert>
                       </bookkeep-alert>
-                      <el-form-item label="匹配规则" label-width="80px">
+                      <el-form-item label="匹配规则" label-width="80px" required>
                         <el-input v-model="drawerForm.rule" placeholder="描述中包含字符时命中规则"></el-input>
                       </el-form-item>
                          <el-form-item label="分类" label-width="80px">
@@ -865,16 +865,20 @@
               },
               drawerSubmit () {
                   const _this = this;
-                  axios.post('/add/rule',{...this.drawerForm},)
-                  .then(function (response) {
-                      _this.drawerForm = __init.drawerForm();
-                      _this.$message({
-                          message: '提交成功',
-                          type: 'success'
-                        })
-                  })
-                  .catch(function (error) {
-                    console.log(error);
+                  this.$refs['drawerFormRef'].validate((valid) => {
+                      console.log(valid,'valid')
+                      if (!valid) return;
+                      axios.post('/add/rule',{...this.drawerForm},)
+                      .then(function (response) {
+                          _this.drawerForm = __init.drawerForm();
+                          _this.$message({
+                              message: '提交成功',
+                              type: 'success'
+                            })
+                      })
+                      .catch(function (error) {
+                        console.log(error);
+                      });
                   });
               },
               onSearch () {

@@ -1,13 +1,13 @@
 """d"""
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql,query_mysql
-from web.enum.enum import to_dict_consumer,to_dict_risk_rank,to_dict_account_type
-
+from web.enum.enum import to_dict_consumer,to_dict_risk_rank,\
+    to_dict_account_type,get_risk_name
+import json
 assets_blueprint = Blueprint('assets', __name__ ,
                            static_folder='web/static',
                             static_url_path='/',
                            template_folder='/web/templates')
-
 
 
 @assets_blueprint.route("/assets/cate/insert", methods=['POST'])
@@ -55,6 +55,64 @@ def assets_insert_batch():
     except BaseException as err:
         print(err)
     return {'code': 200}
+
+
+@assets_blueprint.route("/assets/echarts/overview/pie", methods=['POST'])
+def assets_overview_echart():
+    """
+    资产条目
+    """
+    try:
+        data = request.get_json(force=True)
+        risk = transform_risk(get_risk(data))
+        category = transform_category(get_category(data))
+    except BaseException as err:
+        print(err)
+    return {'code': 200,
+            'category': category,
+            'risk': risk}
+
+
+def get_risk(data):
+    query = f"""
+    SELECT  SUM(a.amount) as value,a.record_time, b.* 
+    FROM assets as a ,assets_cate as b
+    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id
+    GROUP BY risk_rank
+    """
+    return query_mysql(query, '')
+
+
+def get_category(data):
+    query = f"""
+    SELECT  SUM(a.amount) as value,a.record_time, b.* 
+    FROM assets as a ,assets_cate as b
+    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id
+    GROUP BY category
+    """
+    return query_mysql(query, '')
+
+
+def transform_category(cate_list):
+    obj_cate = {}
+    arr_category = []
+    for item in cate_list:
+        category = json.loads(item.get('category'))[0]
+        if obj_cate.get(category):
+            obj_cate[category] = obj_cate[category] + item.get('value')
+        else:
+            obj_cate[category] = item.get('value')
+
+    for key in obj_cate:
+        arr_category.append({'name': key,'value': obj_cate[key]})
+    return arr_category
+
+
+def transform_risk(risk_list):
+    for item in risk_list:
+        item['name'] = get_risk_name(item.get('risk_rank'))
+
+    return risk_list
 
 
 def assets_create_batch(data):
@@ -138,7 +196,6 @@ def get_assets():
     获取接口
     """
     data = request.get_json(force=True)
-
     assets_cate = query_assets_cate(data)
     list_assets = query_assets(data)
     data = transform_data(assets_cate, list_assets)
@@ -157,6 +214,7 @@ def transform_data(assets_cate_list, assets_list):
                     assets_cate[key] = []
                     assets_cate[key].append(assets)
     return assets_cate_list
+
 
 @assets_blueprint.route("/assets/enum", methods=['POST'])
 def assets_enum():
