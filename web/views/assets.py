@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql,query_mysql
 from web.enum.enum import to_dict_consumer,to_dict_risk_rank,\
-    to_dict_account_type,get_risk_name
+    to_dict_account_type,get_risk_name,Account
 import json
 assets_blueprint = Blueprint('assets', __name__ ,
                            static_folder='web/static',
@@ -65,12 +65,82 @@ def assets_overview_echart():
     try:
         data = request.get_json(force=True)
         risk = transform_risk(get_risk(data))
-        category = transform_category(get_category(data))
+        category = transform_category(get_category(data), data)
     except BaseException as err:
         print(err)
     return {'code': 200,
             'category': category,
             'risk': risk}
+
+
+@assets_blueprint.route("/assets/echarts/trend/line", methods=['POST'])
+def assets_trend_echart():
+    """
+    资产条目
+    """
+    try:
+        data = request.get_json(force=True)
+        year = get_assets_year_report(data)
+        wife = get_assets_year_report_by_account_type(data, Account.WIFE.value)
+        husband = get_assets_year_report_by_account_type(data, Account.HUSBAND.value)
+    except BaseException as err:
+        print(err)
+    return {
+            'code': 200,
+            'x': flat_array(year).get('name'),
+            'year': flat_array(year).get('value'),
+            'wife': flat_array(wife).get('value'),
+            'husband': flat_array(husband).get('value')
+            }
+
+
+def flat_array(list):
+    arr_name = []
+    arr_value = []
+    for item in list:
+        arr_name.append(item.get('name'))
+        arr_value.append(item.get('value'))
+    return {
+        'name': arr_name,
+        'value': arr_value
+    }
+
+
+def get_assets_year_report_by_account_type(data, account_type):
+    query = f"""
+        SELECT SUM(tt.amount) as value, tt.name FROM
+        (
+            SELECT assets.amount,
+                 assets.record_time,
+                MONTHNAME(record_time) as name 
+            FROM assets
+            LEFT JOIN assets_cate
+            ON assets.assets_cate_id = assets_cate.id
+            WHERE YEAR(record_time) = "{data.get('year')}" 
+            AND account_type = "{account_type}" 
+        ) tt 
+        GROUP BY tt.name
+	    ORDER BY tt.record_time ASC
+    """
+    return query_mysql(query, '')
+
+
+def get_assets_year_report(data):
+    query = f"""
+           SELECT SUM(tt.amount) as value, tt.name FROM
+            (
+                SELECT assets.amount,
+                    assets.record_time,
+                    MONTHNAME(record_time) as name 
+                FROM assets
+                LEFT JOIN assets_cate
+                ON assets.assets_cate_id = assets_cate.id
+                WHERE YEAR(record_time) = "{data.get('year')}"
+            ) tt 
+            GROUP BY tt.name
+	        ORDER BY tt.record_time ASC
+    """
+    return query_mysql(query, '')
 
 
 def get_risk(data):
@@ -93,9 +163,10 @@ def get_category(data):
     return query_mysql(query, '')
 
 
-def transform_category(cate_list):
+def transform_category(cate_list, data):
     obj_cate = {}
     arr_category = []
+    category_mapping = data.get('categoryObj')
     for item in cate_list:
         category = json.loads(item.get('category'))[0]
         if obj_cate.get(category):
@@ -104,7 +175,7 @@ def transform_category(cate_list):
             obj_cate[category] = item.get('value')
 
     for key in obj_cate:
-        arr_category.append({'name': key,'value': obj_cate[key]})
+        arr_category.append({'name': category_mapping.get(str(key)), 'value': obj_cate[key]})
     return arr_category
 
 
@@ -151,7 +222,6 @@ def assets_create(data):
             "{data.get('assets_cate_id')}",
             "{data.get('record_time')}")
            """
-    print(query_clause)
     run_mysql(query_clause, "")
 
 
