@@ -73,6 +73,10 @@ def to_dict_account_type():
 
 
 def to_dict_consumer():
+    """
+
+    :return:
+    """
     consumer_dict = {i.value: i.name for i in Consumer}
     for key, value in consumer_dict.items():
         consumer_dict[key] = ConsumerString[value]

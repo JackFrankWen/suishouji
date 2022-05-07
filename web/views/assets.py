@@ -1,13 +1,16 @@
 """d"""
+import json
 from flask import Blueprint, render_template, request
 from web.api.my_con import run_mysql,query_mysql
 from web.enum.enum import to_dict_consumer,to_dict_risk_rank,\
-    to_dict_account_type,get_risk_name,Account
-import json
+    to_dict_account_type,get_risk_name,Account,\
+    get_account_name
 assets_blueprint = Blueprint('assets', __name__ ,
                            static_folder='web/static',
                             static_url_path='/',
                            template_folder='/web/templates')
+
+
 
 
 @assets_blueprint.route("/assets/cate/insert", methods=['POST'])
@@ -232,17 +235,42 @@ def get_assets_cate():
     """
 
     data = request.get_json(force=True)
-    return {'data': query_assets_cate(data), 'code': 200}
+    query_data = query_assets_cate()
+    return_val = format_assets_cate(query_data, data)
+    return {'data': return_val, 'code': 200}
 
 
-def query_assets_cate(data):
+def format_assets_cate(list, data):
+    cate_obj = data.get('categoryObj')
+    for item in list:
+        category = json.loads(item.get('category'))[1]
+        item['category'] = json.loads(item.get('category'))
+        item['accountName'] = get_account_name(item.get('account_type'))
+        item['riskName'] = get_risk_name(item.get('risk_rank'))
+        item['categoryName'] = cate_obj.get(str(category))
+    return list
+
+
+def query_assets_cate():
     """
        获取接口
        """
 
-    query = f"""SELECT * FROM assets_cate
-       where account_type = {data.get('account_type')}
+    query = f"""
+    SELECT * FROM assets_cate
+    """
+    return query_mysql(query, '')
+
+
+def query_assets_cate_by_account_type(data):
+    """
+       获取接口
        """
+
+    query = f"""
+    SELECT * FROM assets_cate
+    where account_type = {data.get('account_type')}
+    """
     return query_mysql(query, '')
 
 
@@ -266,7 +294,7 @@ def get_assets():
     获取接口
     """
     data = request.get_json(force=True)
-    assets_cate = query_assets_cate(data)
+    assets_cate = query_assets_cate_by_account_type(data)
     list_assets = query_assets(data)
     data = transform_data(assets_cate, list_assets)
 
