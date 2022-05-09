@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS `assets_cate`(
     id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-    description VARCHAR(200) COMMENT '描述',
+    description VARCHAR(200) COMMENT '描述' NOT NULL,
     category JSON DEFAULT NULL COMMENT '分类',
     account_type INT COMMENT '账户 1.老公钱包 2.老婆钱包 ',
     risk_rank INT COMMENT '风险等级 0 保本 1.低风险 2.中风险 3.高风险',
