@@ -11,8 +11,6 @@ assets_blueprint = Blueprint('assets', __name__ ,
                            template_folder='/web/templates')
 
 
-
-
 @assets_blueprint.route("/assets/cate/insert", methods=['POST'])
 def assets_cate_insert():
     """
@@ -235,8 +233,12 @@ def get_assets_cate():
     """
 
     data = request.get_json(force=True)
-    query_data = query_assets_cate()
-    return_val = format_assets_cate(query_data, data)
+    if data.get('account_type'):
+
+        return_val = query_assets_cate_by_account_type(data)
+    else:
+        query_data = query_assets_cate()
+        return_val = format_assets_cate(query_data, data)
     return {'data': return_val, 'code': 200}
 
 
