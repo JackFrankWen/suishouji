@@ -65,13 +65,24 @@ def assets_overview_echart():
     """
     try:
         data = request.get_json(force=True)
-        risk = transform_risk(get_risk(data))
-        category = transform_category(get_category(data), data)
+        risk = transform_risk(get_risk(data, 0))
+        risk_husband = transform_risk(get_risk(data,  Account.HUSBAND.value))
+        risk_wife = transform_risk(get_risk(data,  Account.WIFE.value))
+        category = transform_category(get_category(data, 0), data)
+        husband = transform_category(get_category(data, Account.HUSBAND.value), data)
+        wife = transform_category(get_category(data, Account.WIFE.value), data)
+
     except BaseException as err:
         print(err)
-    return {'code': 200,
-            'category': category,
-            'risk': risk}
+    return {
+        'code': 200,
+        'husband': husband,
+        'category': category,
+        'wife': wife,
+        'riskWife': risk_wife,
+        'riskHusband': risk_husband,
+        'risk': risk
+    }
 
 
 @assets_blueprint.route("/assets/echarts/trend/line", methods=['POST'])
@@ -123,6 +134,7 @@ def get_assets_year_report_by_account_type(data, account_type):
         GROUP BY tt.name
 	    ORDER BY tt.record_time ASC
     """
+
     return query_mysql(query, '')
 
 
@@ -144,21 +156,33 @@ def get_assets_year_report(data):
     return query_mysql(query, '')
 
 
-def get_risk(data):
+def get_risk(data, accout_type):
+    if accout_type == 0:
+        query_account_type = ''
+    elif accout_type == 1:
+        query_account_type = 'And b.account_type="1"'
+    else:
+        query_account_type = 'And b.account_type="2"'
     query = f"""
     SELECT  SUM(a.amount) as value,a.record_time, b.* 
     FROM assets as a ,assets_cate as b
-    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id
+    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id {query_account_type}
     GROUP BY risk_rank
     """
     return query_mysql(query, '')
 
 
-def get_category(data):
+def get_category(data, accout_type):
+    if accout_type == 0:
+        query_account_type = ''
+    elif accout_type == 1:
+        query_account_type = 'And b.account_type="1"'
+    else:
+        query_account_type = 'And b.account_type="2"'
     query = f"""
     SELECT  SUM(a.amount) as value,a.record_time, b.* 
     FROM assets as a ,assets_cate as b
-    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id
+    WHERE year(record_time)="{data.get('year')}" and month(record_time)='{data.get('month')}' AND a.assets_cate_id = b.id {query_account_type}
     GROUP BY category
     """
     return query_mysql(query, '')
