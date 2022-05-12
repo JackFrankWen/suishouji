@@ -269,11 +269,12 @@ def get_assets_cate():
 def format_assets_cate(list, data):
     cate_obj = data.get('categoryObj')
     for item in list:
-        category = json.loads(item.get('category'))[1]
+        category = json.loads(item.get('category'))
         item['category'] = json.loads(item.get('category'))
         item['accountName'] = get_account_name(item.get('account_type'))
         item['riskName'] = get_risk_name(item.get('risk_rank'))
-        item['categoryName'] = cate_obj.get(str(category))
+        item['categoryName'] = cate_obj.get(str(category[1]))
+        item['categoryType'] = cate_obj.get(str(category[0]))
     return list
 
 
