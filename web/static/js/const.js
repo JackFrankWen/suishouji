@@ -230,6 +230,16 @@ var __const =(function() {
                       label: 'VPN年费以及会员费',
                         tag: fix_cost,
                         consumer: family,
+                    }, {
+                      value: 20009,
+                      label: '家政',
+                        tag: fix_cost,
+                        consumer: family,
+                    }, {
+                      value: 20010,
+                      label: '税费',
+                        tag: fix_cost,
+                        consumer: family,
                     }]
                   }, {
                     value: 40000,
