@@ -190,13 +190,14 @@ def transform_data(list, categoryObj):
                 obj[lvl1]['amount'] += amount
 
         else:
-            if '00000' not in obj.keys():
-                obj['00000'] = {
+            # 未分类创建分类
+            if '100000' not in obj.keys():
+                obj['100000'] = {
                     'amount': decimal.Decimal(0),
                     'child': {
                     }
                 }
-            obj['00000']['amount'] += amount
+            obj['100000']['amount'] += amount
 
     return get_list_amount(obj, categoryObj)
 
