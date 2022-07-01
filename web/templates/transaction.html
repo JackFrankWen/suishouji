@@ -686,10 +686,13 @@
               mappingRule(val) {
                   const rules = __enum.getCategoryMappingRule()
                   const obj = rules[val[1]]
-                  if (obj.hasOwnProperty('consumer'))
-                      this.$set(this.batchUpdateForm, 'consumer', obj.consumer)
-                  if (obj.hasOwnProperty('tag'))
-                      this.$set(this.batchUpdateForm, 'tag', obj.tag)
+                  let consumer = undefined;
+                  let tag = undefined
+                  if (obj.hasOwnProperty('consumer')) consumer = obj.consumer
+                  if (obj.hasOwnProperty('tag')) tag = obj.tag
+
+                  this.$set(this.batchUpdateForm, 'consumer', consumer)
+                  this.$set(this.batchUpdateForm, 'tag', tag)
               },
               setConsumer(val){
                   this.$set(this.formUpload, 'consumer', val)
