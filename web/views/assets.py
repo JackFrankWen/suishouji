@@ -323,6 +323,7 @@ def get_assets():
     data = request.get_json(force=True)
     assets_cate = query_assets_cate_by_account_type(data)
     list_assets = query_assets(data)
+    assets_cate = format_assets_cate(assets_cate, data)
     data = transform_data(assets_cate, list_assets)
 
     return {'data': data, 'code': 200}
