@@ -7,7 +7,6 @@ from web.api.transaction import get_transaction_by_condition, \
     get_consumer_by_condition,\
     get_avg_of_last_quarter_amount,\
     get_avg_of_last_year_month_cost
-from web.api.word import create_doc
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from web.config import get_config
@@ -253,7 +252,7 @@ def export_to_word():
         "account": get_account_by_condition(data),
     }
 
-    create_doc(doc_data)
+    # create_doc(doc_data)
     return {'code': 200, 'data': 'sss'}
 
 
@@ -398,7 +397,7 @@ def insert_transcation(data):
                     "{},"
                     "{},"
                     '"{}", '
-                    "{}, "
+                    '"{}",'
                     "{}, "
                     "{}, "
                     "{},"
@@ -414,6 +413,7 @@ def insert_transcation(data):
         data.get("trans_time"),
         data.get("tag")
     )
+    print(query_clause)
     return run_mysql(query_clause, "")
 
 
