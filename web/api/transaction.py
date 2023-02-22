@@ -58,7 +58,7 @@ def get_tag_amount_by_condition(query_con):
         )
     SELECT tag,
         SUM(amount) as total_amount,
-        ROUND(SUM(amount)/transaction_co.total*100) as percent 
+        ROUND(SUM(amount)/transaction_co.total*100, 2) as percent 
     FROM transaction,transaction_co
     WHERE flow_type=1 {trans_time}
     GROUP BY tag
@@ -103,7 +103,7 @@ def get_consumer_by_condition(query_con):
         )
         SELECT consumer,
             SUM(amount) as total_amount,
-            ROUND(SUM(amount)/transaction_co.total*100) as percent 
+            ROUND(SUM(amount)/transaction_co.total*100, 2) as percent 
         FROM transaction, transaction_co
         WHERE flow_type = 1 {trans_time}
         GROUP BY consumer
@@ -137,7 +137,7 @@ def get_avg_of_last_quarter_amount(data):
         trans_time = data.get('trans_time')[0]
 
     query_clause = f"""
-        SELECT AVG(total) as month_avg 
+        SELECT ROUND(AVG(total)) as month_avg 
         FROM
         (
             SELECT DATE_FORMAT(trans_time,'%Y-%m') as time, 
@@ -155,7 +155,7 @@ def get_avg_of_last_year_month_cost():
     :return:
     """
     query_clause = f"""
-            SELECT AVG(total) as month_avg
+            SELECT ROUND(AVG(total)) as month_avg
            FROM
                (
                     SELECT DATE_FORMAT(trans_time,'%Y-%m') as time, 

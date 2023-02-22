@@ -11,10 +11,15 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from web.config import get_config
 from flask import Response
+from web.dingtalkchatbot.chatbot import DingtalkChatbot
 import re
 import json
 import decimal
 import copy
+
+webhook = 'https://oapi.dingtalk.com/robot/send?access_token=377c91427fbb3874c75530a8ed3f1873414c5289f88e6980a3245b7fd6835e2e'
+secret = 'SEC7f13f87bb821ff85f3115986f1163eda433a00b857b41d93d272c1c848449b84'  # 可选：创建机器人勾选“加签”选项时使用
+xiaoding = DingtalkChatbot(webhook, secret=secret)  # 方式二：勾选“加签”选项时使用（v1.5以上新功能）
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -232,6 +237,7 @@ def export_to_word():
     data = request.get_json(force=True)
     last = hand_data(data)
 
+
     last_year_month_cost_avg = get_avg_of_last_year_month_cost()
     avg_of_last_quarter_amount = get_avg_of_last_quarter_amount(data)
 
@@ -251,9 +257,27 @@ def export_to_word():
         "consumer_last_month_dict": array_to_dict(get_consumer_by_condition(last), "consumer"),
         "account": get_account_by_condition(data),
     }
+    tagObj = data.get('tagObj')
+    accountTypeObj = data.get('accountTypeObj')
+    consumerObj = data.get('consumerObj')
+    account_type = ''.join(map(lambda x: f"{accountTypeObj.get(str(x.get('account_type')))}支出{x.get('total_amount')}元。", get_account_by_condition(data)))
+    consumer = ''.join(map(lambda x: f"{consumerObj.get(str(x.get('consumer')))}支出{x.get('total_amount')}元，占比{x.get('percent')}%。",get_consumer_by_condition(data)))
+    tag = ''.join(map(lambda x: f"{tagObj.get(str(x.get('tag')))}{x.get('total_amount')}元，占比{x.get('percent')}%。", get_tag_amount_by_condition(data)))
+    msg = f"## 三月账单\n"\
+        f"### 本月共消费 999 元,{account_type}\n"\
+        f"- 种类：食品消费多少元。\n"\
+        f"- 标签：{tag} \n"\
+        f"- 成员：{consumer} \n"\
+        f"### 对比。\n" \
+        f"> 去年每月平均支出{last_year_month_cost_avg[0].get('month_avg')}元\n" \
+        f"> 上个季度平均支出{avg_of_last_quarter_amount[0].get('month_avg')}元。\n" \
+        f"\n"
 
-    # create_doc(doc_data)
-    return {'code': 200, 'data': 'sss'}
+    # xiaoding.send_markdown(title='账单', text=msg,
+    #                        is_at_all=True)
+    print(tagObj)
+    print(msg)
+    return {'code': 200, 'data': doc_data}
 
 
 @transaction_blueprint.route("/transcation/delete", methods=['POST'])

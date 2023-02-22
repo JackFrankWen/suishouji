@@ -300,7 +300,11 @@ var __const =(function() {
                         tag: variable_cost,
                     }, {
                       value: 30005,
-                      label: '停车费（油费）',
+                      label: '停车费',
+                        tag: general_cost,
+                    }, {
+                      value: 30006,
+                      label: '油费',
                         tag: general_cost,
                     }]
                   }, {
@@ -378,18 +382,23 @@ var __const =(function() {
                     children: [{
                       value: 110001,
                       label: '交通费用',
+                        tag: variable_cost,
                     }, {
                       value: 110002,
                       label: '住宿费',
+                         tag: variable_cost,
                     }, {
                       value: 110003,
                       label: '餐饮费',
+                         tag: variable_cost,
                     }, {
                       value: 110004,
                       label: '娱乐费',
+                        tag: variable_cost,
                     }, {
                       value: 110005,
                       label: '其他费用',
+                         tag: variable_cost,
                     }]
                   }, {
                     value: 100000,
